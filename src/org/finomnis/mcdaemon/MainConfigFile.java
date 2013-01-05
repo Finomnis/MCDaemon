@@ -36,7 +36,7 @@ public class MainConfigFile extends ConfigFile {
 				return true;
 			return false;
 		default:
-			return false;
+			return true;
 		}	
 	}
 
