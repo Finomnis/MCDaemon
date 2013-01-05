@@ -31,7 +31,7 @@ public class MCDaemon {
 		
 		lock.unlock();
 
-		Log.out("Daemon is now running.");
+		Log.debug("Daemon is now running.");
 		
 	}
 	
@@ -54,7 +54,7 @@ public class MCDaemon {
 		
 		lock.unlock();
 		
-		Log.out("Daemon stopped.");
+		Log.debug("Daemon stopped.");
 		
 	}
 	
@@ -75,12 +75,26 @@ public class MCDaemon {
 		
 		lock.unlock();
 		
-		Log.out("Daemon shut down.");
+		Log.debug("Daemon shut down.");
 	}
 	
 	private static void initialize()
 	{
+		// Load config file
+		MainConfigFile configFile = new MainConfigFile();
 		
+		switch(configFile.getConfig("mcEdition")){
+		case "ftb":
+			break;
+		case "vanilla":
+			break;
+		case "bukkit":
+			break;
+		default:
+			break;
+		}
+		
+		Log.out("Config: " + configFile.getConfig("mcEdition"));
 	}
 	
 	private static void terminate()

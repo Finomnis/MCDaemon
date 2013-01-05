@@ -5,5 +5,8 @@
 *.war
 *.ear
 
-# Binaries folder
+# Binaries folder #
 bin/*
+
+# Config Files #
+*.cfg
