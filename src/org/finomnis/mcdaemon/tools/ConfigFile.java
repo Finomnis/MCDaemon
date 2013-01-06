@@ -22,37 +22,51 @@ public abstract class ConfigFile {
 		setDefaultValues(defaultValues);
 		values.putAll(defaultValues);
 
-		fileName = getFileName() + ".cfg";
+		fileName = getFileName();
 
 		readFromFile();
 		writeToFile();
 	}
 
+	protected boolean isValid(String configName, String value) {
+		String validValues[] = getValidValues(configName);
+		if (validValues != null) {
+			for (String validValue : validValues) {
+				if (validValue.equals(value)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		return true;
+	}
+
 	public String getConfig(String configName) {
+
 		String res = values.get(configName);
 		if (res == null)
 			throw new RuntimeException("Key '" + configName + "' not found!");
-		if(!isValid(configName, res))
-		{
+
+		// Check if value is valid, otherwise replace with default value
+		if (!isValid(configName, res)) {
 			res = defaultValues.get(configName);
 			if (res == null)
-				throw new RuntimeException("Key '" + configName + "' not found!");
+				throw new RuntimeException("Key '" + configName
+						+ "' not found!");
 			values.put(configName, res);
 			writeToFile();
 		}
-		
+
 		return res;
 	}
-	
-	public void setConfig(String configName, String value){
-		if(!values.containsKey(configName))
+
+	public void setConfig(String configName, String value) {
+		if (!values.containsKey(configName))
 			throw new RuntimeException("Key '" + configName + "' not found!");
 		values.put(configName, value);
 		writeToFile();
 	}
 
-	
-	
 	private void readFromFile() {
 		Scanner scanner;
 
@@ -100,7 +114,7 @@ public abstract class ConfigFile {
 		FileWriter f;
 
 		try {
-			f = new FileWriter(fileName);
+			f = FileTools.openFileWrite(fileName, false);
 		} catch (IOException e) {
 			Log.err(e);
 			Log.err("Unable to write config to file!");
@@ -110,9 +124,24 @@ public abstract class ConfigFile {
 		try {
 
 			for (Entry<String, String> e : values.entrySet()) {
-				String[] configDescription = getConfigDescription(e.getKey()).split("\\r?\\n");
-				for(String str : configDescription)
+				String configDescription = getConfigDescription(e.getKey());
+				if(configDescription == null)
+					configDescription = "";
+				
+				String[] validValues = getValidValues(e.getKey());
+				if(validValues != null)
 				{
+					if(!configDescription.equals(""))
+						configDescription += "\n";
+					configDescription += "  Valid values: ";
+					for(int i = 0; i < validValues.length; i++)
+					{
+						if(i != 0) configDescription += ", ";
+						configDescription += "'" + validValues[i] + "'";
+					}	
+				}
+				
+				for (String str : configDescription.split("\\r?\\n")) {
 					f.write("# " + str + "\r\n");
 				}
 				f.write(e.getKey() + "=" + e.getValue() + "\r\n\r\n");
@@ -136,6 +165,6 @@ public abstract class ConfigFile {
 
 	protected abstract String getConfigDescription(String config);
 
-	protected abstract boolean isValid(String config, String value);
-	
+	protected abstract String[] getValidValues(String config);
+
 }

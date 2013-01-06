@@ -13,7 +13,7 @@ public class MainConfigFile extends ConfigFile {
 
 	@Override
 	protected String getFileName() {
-		return "mcdaemon";
+		return "mcdaemon.cfg";
 	}
 
 	@Override
@@ -21,22 +21,20 @@ public class MainConfigFile extends ConfigFile {
 		switch(config)
 		{
 		case "mcEdition": 
-			return "Determines the Minecraft-Edition. Possible values:\n - vanilla\n - bukkit\n - ftb";
+			return "Determines the Minecraft-Edition.";
 		default:
 			return "No description available.";
 		}				
 	}
 
 	@Override
-	protected boolean isValid(String config, String value) {
+	protected String[] getValidValues(String config) {
 		switch(config)
 		{
 		case "mcEdition":
-			if(value.equals("ftb") || value.equals("vanilla") || value.equals("bukkit"))
-				return true;
-			return false;
+			return new String[]{"ftb", "vanilla", "bukkit"};
 		default:
-			return true;
+			return null;
 		}	
 	}
 
