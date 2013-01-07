@@ -8,10 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 public abstract class ConfigFile {
 
-	private Map<String, String> values = new HashMap<String, String>();
+	private Map<String, String> values = new TreeMap<String, String>();
 	private Map<String, String> defaultValues = new HashMap<String, String>();
 	private String fileName = "";
 
@@ -30,15 +31,43 @@ public abstract class ConfigFile {
 
 	protected boolean isValid(String configName, String value) {
 		String validValues[] = getValidValues(configName);
-		if (validValues != null) {
-			for (String validValue : validValues) {
-				if (validValue.equals(value)) {
+
+		if (validValues == null)
+			return true;
+
+		// sort out special values
+		if (validValues.length == 1) {
+			switch (validValues[0]) {
+			case ":int:":
+				try {
+					Integer.parseInt(value);
 					return true;
+				} catch (Exception e) {
+					return false;
 				}
+			case ":bool:":
+				if (value.equals("false") || value.equals("true"))
+					return true;
+				return false;
+			case ":path:":
+				if(value.length() < 2)
+					return false;
+				if (!value.startsWith("\"") || !value.endsWith("\""))
+					return false;
+				return true;
+			default:
+				break;
 			}
-			return false;
 		}
-		return true;
+
+		// check values
+		for (String validValue : validValues) {
+			if (validValue.equals(value)) {
+				return true;
+			}
+		}
+		return false;
+
 	}
 
 	public String getConfig(String configName) {
@@ -67,6 +96,8 @@ public abstract class ConfigFile {
 		writeToFile();
 	}
 
+	
+	
 	private void readFromFile() {
 		Scanner scanner;
 
@@ -95,8 +126,18 @@ public abstract class ConfigFile {
 					String key = nextLine.substring(0, splitPos);
 					String value = nextLine.substring(splitPos + 1);
 
-					if (values.containsKey(key))
-						values.put(key, value);
+					if (!values.containsKey(key))
+						continue;
+					
+					// Check if value is valid, otherwise replace with default value
+					if (!isValid(key, value)) {
+						value = defaultValues.get(key);
+						if (value == null)
+							throw new RuntimeException("Key '" + key
+									+ "' not found!");
+					}
+					
+					values.put(key, value);
 
 				} catch (Exception e) {
 					Log.warn(e);
@@ -125,22 +166,27 @@ public abstract class ConfigFile {
 
 			for (Entry<String, String> e : values.entrySet()) {
 				String configDescription = getConfigDescription(e.getKey());
-				if(configDescription == null)
+				if (configDescription == null)
 					configDescription = "";
-				
+
 				String[] validValues = getValidValues(e.getKey());
-				if(validValues != null)
-				{
-					if(!configDescription.equals(""))
+				
+				boolean printValidValues = true;
+				if(validValues.length == 1)
+					if(validValues[0].startsWith(":") && validValues[0].endsWith(":"))
+						printValidValues = false;
+				
+				if (validValues != null && printValidValues) {
+					if (!configDescription.equals(""))
 						configDescription += "\n";
 					configDescription += "  Valid values: ";
-					for(int i = 0; i < validValues.length; i++)
-					{
-						if(i != 0) configDescription += ", ";
+					for (int i = 0; i < validValues.length; i++) {
+						if (i != 0)
+							configDescription += ", ";
 						configDescription += "'" + validValues[i] + "'";
-					}	
+					}
 				}
-				
+
 				for (String str : configDescription.split("\\r?\\n")) {
 					f.write("# " + str + "\r\n");
 				}
