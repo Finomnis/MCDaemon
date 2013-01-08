@@ -155,7 +155,7 @@ public abstract class ConfigFile {
 		FileWriter f;
 
 		try {
-			f = FileTools.openFileWrite(fileName, false);
+			f = FileTools.openFileWriteText(fileName, false);
 		} catch (IOException e) {
 			Log.err(e);
 			Log.err("Unable to write config to file!");

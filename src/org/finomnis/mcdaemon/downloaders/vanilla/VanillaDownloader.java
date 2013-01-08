@@ -1,25 +1,37 @@
 package org.finomnis.mcdaemon.downloaders.vanilla;
 
 import org.finomnis.mcdaemon.downloaders.MCDownloader;
+import org.finomnis.mcdaemon.tools.FileTools;
+import org.finomnis.mcdaemon.tools.Log;
 
 public class VanillaDownloader implements MCDownloader {
 
+	
+	
 	@Override
 	public void initialize() {
-		// TODO Auto-generated method stub
 
+		if(!FileTools.folderExists("vanilla"))
+			FileTools.createFolder("vanilla");
+		
+		if(!FileTools.fileExists("vanilla/server.jar"))
+			update();
+		
 	}
 
 	@Override
 	public boolean updateAvailable() {
-		// TODO Auto-generated method stub
+
+		
+
 		return false;
 	}
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
-
+		
+		Log.out("Updating server.jar.");
+		
 	}
 
 }
