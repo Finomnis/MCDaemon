@@ -8,7 +8,7 @@ public class MainConfigFile extends ConfigFile {
 
 	@Override
 	protected void setDefaultValues(Map<String, String> configs) {
-		configs.put("mcEdition", "ftb");
+		configs.put("mcEdition", "vanilla");
 		configs.put("backupEnabled", "true");
 		configs.put("backupInterval", "720");
 		configs.put("backupScript", "\"backup.sh\"");

@@ -100,8 +100,7 @@ public class MCDaemon {
 				return;
 			}
 
-			if(!mcDownloader.isInitialized())
-				mcDownloader.initialize();
+			mcDownloader.initialize();
 			
 		} catch (Exception e) {
 			Log.err(e);

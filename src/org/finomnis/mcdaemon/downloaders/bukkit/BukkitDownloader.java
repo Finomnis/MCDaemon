@@ -4,12 +4,8 @@ import org.finomnis.mcdaemon.downloaders.MCDownloader;
 
 public class BukkitDownloader implements MCDownloader {
 
-	@Override
-	public boolean isInitialized() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
+	
+	
 	@Override
 	public void initialize() {
 		// TODO Auto-generated method stub
