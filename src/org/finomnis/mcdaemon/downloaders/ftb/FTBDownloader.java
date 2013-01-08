@@ -22,4 +22,16 @@ public class FTBDownloader implements MCDownloader {
 
 	}
 
+	@Override
+	public String getFolderName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getServerJarName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

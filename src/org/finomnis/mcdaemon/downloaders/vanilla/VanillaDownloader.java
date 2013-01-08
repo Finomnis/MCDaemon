@@ -13,16 +13,20 @@ import org.finomnis.mcdaemon.tools.Log;
 
 public class VanillaDownloader implements MCDownloader {
 
-	private final static String newJarName = "server.jar.new";
+	private String folderName = "vanilla";
+	private String serverJarName = folderName + "/server.jar";
+	private String newJarName = serverJarName + ".new";
 	private final static String downloadUrl = "https://s3.amazonaws.com/MinecraftDownload/launcher/minecraft_server.jar";
+	
+	
 	
 	@Override
 	public void initialize() throws IOException, CriticalException {
 
-		if(!FileTools.folderExists("vanilla"))
-			FileTools.createFolder("vanilla");
+		if(!FileTools.folderExists(folderName))
+			FileTools.createFolder(folderName);
 		
-		if(!FileTools.fileExists("vanilla/server.jar"))
+		if(!FileTools.fileExists(serverJarName))
 			update();
 		
 	}
@@ -30,12 +34,12 @@ public class VanillaDownloader implements MCDownloader {
 	private void downloadNewJar() throws IOException, CriticalException
 	{
 		InputStream downloadStream = DownloadTools.openUrl(downloadUrl);
-		OutputStream newJar = FileTools.openFileWrite("vanilla/" + newJarName, false);
+		OutputStream newJar = FileTools.openFileWrite(newJarName, false);
 		FileTools.writeFromStream(downloadStream, newJar);
 		downloadStream.close();
 		newJar.close();
 		
-		if(10 > FileTools.fileSize("vanilla/" + newJarName))
+		if(10 > FileTools.fileSize(newJarName))
 			throw new CriticalException("Unable to download server jar!");
 				
 	}
@@ -43,16 +47,16 @@ public class VanillaDownloader implements MCDownloader {
 	@Override
 	public boolean updateAvailable(){
 
-		if(!FileTools.fileExists("vanilla/server.jar"))
+		if(!FileTools.fileExists(serverJarName))
 			return true;
 			
 		try {
 			
 			downloadNewJar();
 
-			String newJarMD5 = FileTools.md5(new File("vanilla/" + newJarName));
+			String newJarMD5 = FileTools.md5(new File(newJarName));
 
-			String oldJarMD5 = FileTools.md5(new File("vanilla/server.jar"));
+			String oldJarMD5 = FileTools.md5(new File(serverJarName));
 
 			if(newJarMD5.equals(oldJarMD5))
 				return false;
@@ -69,12 +73,22 @@ public class VanillaDownloader implements MCDownloader {
 	@Override
 	public void update() throws IOException, CriticalException {
 		
-		Log.out("Updating server.jar.");
+		Log.out("Updating server jar.");
 		
 		downloadNewJar();
 		
-		FileTools.copyFile("vanilla/" + newJarName, "vanilla/server.jar");
+		FileTools.copyFile(newJarName, serverJarName);
 		
+	}
+
+	@Override
+	public String getFolderName() {
+		return folderName;
+	}
+
+	@Override
+	public String getServerJarName() {
+		return serverJarName;
 	}
 
 }

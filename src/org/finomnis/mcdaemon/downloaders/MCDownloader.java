@@ -6,6 +6,8 @@ import org.finomnis.mcdaemon.tools.CriticalException;
 
 public interface MCDownloader {
 
+	public String getFolderName();
+	public String getServerJarName();
 	public void initialize() throws IOException, CriticalException;
 	public boolean updateAvailable();
 	public void update() throws IOException, CriticalException;
