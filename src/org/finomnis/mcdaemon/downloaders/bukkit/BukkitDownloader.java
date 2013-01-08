@@ -3,8 +3,6 @@ package org.finomnis.mcdaemon.downloaders.bukkit;
 import org.finomnis.mcdaemon.downloaders.MCDownloader;
 
 public class BukkitDownloader implements MCDownloader {
-
-	
 	
 	@Override
 	public void initialize() {

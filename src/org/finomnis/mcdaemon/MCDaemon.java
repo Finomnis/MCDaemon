@@ -8,6 +8,7 @@ import org.finomnis.mcdaemon.downloaders.MCDownloader;
 import org.finomnis.mcdaemon.downloaders.bukkit.BukkitDownloader;
 import org.finomnis.mcdaemon.downloaders.ftb.FTBDownloader;
 import org.finomnis.mcdaemon.downloaders.vanilla.VanillaDownloader;
+import org.finomnis.mcdaemon.tools.ConfigNotFoundException;
 import org.finomnis.mcdaemon.tools.Log;
 
 public class MCDaemon {
@@ -15,7 +16,8 @@ public class MCDaemon {
 	private static boolean running = false;
 	private static Lock lock = new ReentrantLock();
 	private static Condition runningChangedCondition = lock.newCondition();
-
+	private static MainConfigFile configFile = null;
+	
 	public static void start() {
 		Log.out("Starting Daemon ...");
 
@@ -80,7 +82,6 @@ public class MCDaemon {
 		try {
 			
 			// Load config file
-			MainConfigFile configFile;
 			configFile = new MainConfigFile();
 
 			// Load Minecraft Downloader
@@ -111,6 +112,13 @@ public class MCDaemon {
 
 	private static void terminate() {
 
+	}
+	
+	public static String getConfig(String config) throws ConfigNotFoundException
+	{
+	
+		return configFile.getConfig(config);
+		
 	}
 
 }

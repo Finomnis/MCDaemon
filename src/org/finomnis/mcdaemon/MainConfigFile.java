@@ -13,6 +13,7 @@ public class MainConfigFile extends ConfigFile {
 		configs.put("backupInterval", "720");
 		configs.put("backupScript", "\"backup.sh\"");
 		configs.put("autoPatcherInterval", "30");
+		configs.put("serverMemory", "1024");
 	}
 
 	@Override
@@ -34,6 +35,8 @@ public class MainConfigFile extends ConfigFile {
 			return "Location of the backup-script";
 		case "autoPatcherInterval":
 			return "In which intervall to update. (in minutes)";
+		case "serverMemory":
+			return "The amount of memory reserved for the server. (in MB)";
 		default:
 			return "No description available.";
 		}				
@@ -52,6 +55,8 @@ public class MainConfigFile extends ConfigFile {
 		case "backupScript":
 			return new String[]{":path:"};
 		case "autoPatcherInterval":
+			return new String[]{":int:"};
+		case "serverMemory":
 			return new String[]{":int:"};
 		default:
 			return null;
