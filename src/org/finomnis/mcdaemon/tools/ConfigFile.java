@@ -70,17 +70,17 @@ public abstract class ConfigFile {
 
 	}
 
-	public String getConfig(String configName) {
+	public String getConfig(String configName) throws ConfigNotFoundException {
 
 		String res = values.get(configName);
 		if (res == null)
-			throw new RuntimeException("Key '" + configName + "' not found!");
+			throw new ConfigNotFoundException("Key '" + configName + "' not found!");
 
 		// Check if value is valid, otherwise replace with default value
 		if (!isValid(configName, res)) {
 			res = defaultValues.get(configName);
 			if (res == null)
-				throw new RuntimeException("Key '" + configName
+				throw new ConfigNotFoundException("Key '" + configName
 						+ "' not found!");
 			values.put(configName, res);
 			writeToFile();
@@ -89,9 +89,9 @@ public abstract class ConfigFile {
 		return res;
 	}
 
-	public void setConfig(String configName, String value) {
+	public void setConfig(String configName, String value) throws ConfigNotFoundException {
 		if (!values.containsKey(configName))
-			throw new RuntimeException("Key '" + configName + "' not found!");
+			throw new ConfigNotFoundException("Key '" + configName + "' not found!");
 		values.put(configName, value);
 		writeToFile();
 	}
@@ -133,7 +133,7 @@ public abstract class ConfigFile {
 					if (!isValid(key, value)) {
 						value = defaultValues.get(key);
 						if (value == null)
-							throw new RuntimeException("Key '" + key
+							throw new CriticalException("Key '" + key
 									+ "' not found!");
 					}
 					

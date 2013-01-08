@@ -1,9 +1,13 @@
 package org.finomnis.mcdaemon.downloaders;
 
+import java.io.IOException;
+
+import org.finomnis.mcdaemon.tools.CriticalException;
+
 public interface MCDownloader {
 
-	public void initialize();
+	public void initialize() throws IOException, CriticalException;
 	public boolean updateAvailable();
-	public void update();
+	public void update() throws IOException, CriticalException;
 	
 }

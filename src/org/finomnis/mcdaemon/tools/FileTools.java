@@ -14,7 +14,7 @@ import java.security.NoSuchAlgorithmException;
 
 public class FileTools {
 
-	static FileWriter openFileWriteText(File f, boolean append) throws IOException
+	public static FileWriter openFileWriteText(File f, boolean append) throws IOException
 	{
 		File dir = f.getParentFile();
 		if (dir != null) {
@@ -23,24 +23,24 @@ public class FileTools {
 		return new FileWriter(f, append);
 	}
 	
-	static FileWriter openFileWriteText(String path, boolean append)
+	public static FileWriter openFileWriteText(String path, boolean append)
 			throws IOException {
 		File f = new File(path);
 		return openFileWriteText(f, append);		
 	}
 
-	static OutputStream openFileWrite(File f, boolean append) throws FileNotFoundException
+	public static OutputStream openFileWrite(File f, boolean append) throws FileNotFoundException
 	{
 		return new FileOutputStream(f, append);
 	}
 	
-	static OutputStream openFileWrite(String path, boolean append) throws FileNotFoundException
+	public static OutputStream openFileWrite(String path, boolean append) throws FileNotFoundException
 	{
 		File f = new File(path);
 		return openFileWrite(f, append);
 	}
 	
-	static void writeFromStream(InputStream iStream, OutputStream fWriter) throws IOException
+	public static void writeFromStream(InputStream iStream, OutputStream fWriter) throws IOException
 	{
 		
 		byte[] buf = new byte[2048];
@@ -57,24 +57,38 @@ public class FileTools {
 		
 	}
 	
-	static InputStream openFileRead(File file) throws FileNotFoundException
+	public static long fileSize(File f)
+	{
+		
+		return f.length();
+		
+	}
+	
+	public static long fileSize(String filename)
+	{
+		
+		return fileSize(new File(filename));
+		
+	}
+	
+	public static InputStream openFileRead(File file) throws FileNotFoundException
 	{
 		return new FileInputStream(file);
 	}
 	
-	static InputStream openFileRead(String path) throws FileNotFoundException
+	public static InputStream openFileRead(String path) throws FileNotFoundException
 	{
 		File f = new File(path);
 		return openFileRead(f);
 	}
 	
-	public static String md5(byte[] data) {
+	public static String md5(byte[] data) throws CriticalException {
 
 		MessageDigest md5Calculator;
 		try {
 			md5Calculator = MessageDigest.getInstance("MD5");
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("Unable to initialize MD5 calculator!");
+			throw new CriticalException("Unable to initialize MD5 calculator!");
 		}
 
 		BigInteger md5Value = new BigInteger(1, md5Calculator.digest(data));
@@ -82,13 +96,13 @@ public class FileTools {
 		return md5Value.toString(16);
 	}
 	
-	public static String md5(String str) {
+	public static String md5(String str) throws CriticalException {
 
 		return md5(str.getBytes());
 
 	}
 	
-	public static String md5(File f) throws IOException{
+	public static String md5(File f) throws IOException, CriticalException{
 		
 		InputStream iStream = openFileRead(f);
 		String md5String = md5(iStream);
@@ -97,13 +111,25 @@ public class FileTools {
 		
 	}
 	
-	public static String md5(InputStream iStream) throws IOException{
+	public static void copyFile(String inFile, String outFile) throws IOException
+	{
+	
+		InputStream iStream = openFileRead(inFile);
+		OutputStream oStream = openFileWrite(outFile, false);
+		writeFromStream(iStream, oStream);
+		iStream.close();
+		oStream.close();
+		
+	}
+	
+	
+	public static String md5(InputStream iStream) throws IOException, CriticalException{
 		
 		MessageDigest md5Calculator;
 		try {
 			md5Calculator = MessageDigest.getInstance("MD5");
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("Unable to initialize MD5 calculator!");
+			throw new CriticalException("Unable to initialize MD5 calculator!");
 		}
 				
 		byte[] input = new byte[2048];
