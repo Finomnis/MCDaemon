@@ -1,6 +1,7 @@
 package org.finomnis.mcdaemon.downloaders.ftb;
 
 import org.finomnis.mcdaemon.downloaders.MCDownloader;
+import java.util.List;
 
 public class FTBDownloader implements MCDownloader {
 
@@ -30,6 +31,12 @@ public class FTBDownloader implements MCDownloader {
 
 	@Override
 	public String getServerJarName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<String> getInvocationCommand() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -1,5 +1,8 @@
 package org.finomnis.mcdaemon;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -8,6 +11,8 @@ import org.finomnis.mcdaemon.downloaders.MCDownloader;
 import org.finomnis.mcdaemon.downloaders.bukkit.BukkitDownloader;
 import org.finomnis.mcdaemon.downloaders.ftb.FTBDownloader;
 import org.finomnis.mcdaemon.downloaders.vanilla.VanillaDownloader;
+import org.finomnis.mcdaemon.server.ServerMonitor;
+import org.finomnis.mcdaemon.server.ServerWrapper;
 import org.finomnis.mcdaemon.tools.ConfigNotFoundException;
 import org.finomnis.mcdaemon.tools.Log;
 
@@ -17,6 +22,10 @@ public class MCDaemon {
 	private static Lock lock = new ReentrantLock();
 	private static Condition runningChangedCondition = lock.newCondition();
 	private static MainConfigFile configFile = null;
+	private static MCDownloader mcDownloader = null;
+	private static ServerMonitor serverMonitor = null;
+	//
+	private static ServerWrapper serverWrapper = null;
 	
 	public static void start() {
 		Log.out("Starting Daemon ...");
@@ -85,7 +94,6 @@ public class MCDaemon {
 			configFile = new MainConfigFile();
 
 			// Load Minecraft Downloader
-			MCDownloader mcDownloader;
 			switch (configFile.getConfig("mcEdition")) {
 			case "ftb":
 				mcDownloader = new FTBDownloader();
@@ -97,27 +105,44 @@ public class MCDaemon {
 				mcDownloader = new BukkitDownloader();
 				break;
 			default:
-				Log.err("Unable to determine correct downloader!");
-				return;
+				throw new RuntimeException("Unable to determine downloader!");
 			}
 
 			mcDownloader.initialize();
 			
+			//ProcessBuilder pb = new ProcessBuilder(mcDownloader.getInvocationCommand());
+			//pb.directory(new File(mcDownloader.getFolderName()));
+			//Process proc = pb.start();
+			
+			//serverMonitor = new ServerMonitor(mcDownloader);
+			serverWrapper = new ServerWrapper(mcDownloader);			
+			serverWrapper.startServer();
+			
 		} catch (Exception e) {
 			Log.err(e);
-			return;
+			throw new RuntimeException("Unable to initialize");
 		}
 
 	}
 
 	private static void terminate() {
 
+		if(serverWrapper != null)
+			serverWrapper.shutdown();
+		
 	}
 	
 	public static String getConfig(String config) throws ConfigNotFoundException
 	{
 	
 		return configFile.getConfig(config);
+		
+	}
+	
+	public static ServerMonitor getServerMonitor()
+	{
+		
+		return serverMonitor;
 		
 	}
 

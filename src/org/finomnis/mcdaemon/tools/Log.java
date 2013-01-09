@@ -30,14 +30,20 @@ public class Log {
 	{
 		
 		System.err.println(format("WARNING: " + e.getMessage()));
-		
+		for(StackTraceElement tr : e.getStackTrace())
+		{
+			System.err.println("   " + tr);
+		}
 	}
 	
 	public static void err(Exception e)
 	{
 		
 		System.err.println(format("ERROR: " + e.getMessage()));
-		
+		for(StackTraceElement tr : e.getStackTrace())
+		{
+			System.err.println("   " + tr);
+		}
 	}
 	
 	private static String format(String msg)
