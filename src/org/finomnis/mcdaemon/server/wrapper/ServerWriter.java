@@ -1,4 +1,4 @@
-package org.finomnis.mcdaemon.server;
+package org.finomnis.mcdaemon.server.wrapper;
 
 import java.io.IOException;
 import java.io.OutputStream;

@@ -1,4 +1,4 @@
-package org.finomnis.mcdaemon.server;
+package org.finomnis.mcdaemon.server.wrapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.finomnis.mcdaemon.server.ServerWrapper.Status;
+import org.finomnis.mcdaemon.server.wrapper.ServerWrapper.Status;
 import org.finomnis.mcdaemon.tools.Log;
 
 public class ServerReader implements Runnable{

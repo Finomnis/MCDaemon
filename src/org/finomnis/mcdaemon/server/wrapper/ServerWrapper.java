@@ -1,4 +1,4 @@
-package org.finomnis.mcdaemon.server;
+package org.finomnis.mcdaemon.server.wrapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +7,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.finomnis.mcdaemon.downloaders.MCDownloader;
+import org.finomnis.mcdaemon.server.ServerMonitor;
 import org.finomnis.mcdaemon.tools.CriticalException;
 import org.finomnis.mcdaemon.tools.Log;
 import org.finomnis.mcdaemon.tools.SyncVar;
@@ -29,13 +30,14 @@ public class ServerWrapper {
 	private Thread stdInThread;
 	private ServerReader stdOut;
 	private Thread stdOutThread;
-	
-	private MCDownloader mcDownloader;
 
-	
-	public ServerWrapper(MCDownloader mcDownloader) {
+	private MCDownloader mcDownloader;
+	private ServerMonitor serverMonitor;
+
+	public ServerWrapper(MCDownloader mcDownloader, ServerMonitor serverMonitor) {
 		this.mcDownloader = mcDownloader;
-		
+		this.serverMonitor = serverMonitor;
+
 		serverLock = new ReentrantLock();
 
 		stillAlive = new SyncVar<Boolean>(false);
@@ -48,16 +50,25 @@ public class ServerWrapper {
 		stdInThread = new Thread(stdIn);
 		stdOut = new ServerReader(this);
 		stdOutThread = new Thread(stdOut);
-		
+
 		stdInThread.start();
 		stdOutThread.start();
 	}
 
-	public synchronized void startServer() throws CriticalException, IOException {
+	public void killServer() {
+		Log.out("Killing server...");
+		if (serverProcess != null)
+			serverProcess.destroy();
+	}
+
+	public synchronized void startServer() throws CriticalException,
+			IOException {
+		Log.out("Starting server...");
 		serverLock.lock();
 		try {
 			if (status.get() != Status.stopped)
-				throw new CriticalException("Can't start server! Already running!");
+				throw new CriticalException(
+						"Can't start server! Already running!");
 			if (shutdownRequested.get())
 				throw new CriticalException(
 						"Can't start server! System shutdown in progress!");
@@ -78,14 +89,13 @@ public class ServerWrapper {
 	}
 
 	public synchronized void stopServer() {
+		Log.out("Stopping server...");
 		serverLock.lock();
 		try {
 			stdIn.write("stop");
-			if(!status.waitForValue(Status.stopped, 30000))
-			{
+			if (!status.waitForValue(Status.stopped, 60000)) {
 				serverProcess.destroy();
-				if(!status.waitForValue(Status.stopped, 10000))
-				{
+				if (!status.waitForValue(Status.stopped, 10000)) {
 					Log.err("Unable to stop server!");
 				}
 			}
@@ -97,13 +107,16 @@ public class ServerWrapper {
 	}
 
 	public synchronized void shutdown() {
+		Log.out("Shutting down server wrapper...");
 		serverLock.lock();
 		try {
-			shutdownRequested.set(true);
-			if (status.get() != Status.stopped)
-				stopServer();
-			stdIn.initializeShutdown();
-			stdOut.initializeShutdown();
+			if (!shutdownRequested.get()) {
+				shutdownRequested.set(true);
+				if (status.get() != Status.stopped)
+					stopServer();
+				stdIn.initializeShutdown();
+				stdOut.initializeShutdown();
+			}
 			try {
 				stdInThread.join();
 			} catch (InterruptedException e) {
@@ -125,6 +138,8 @@ public class ServerWrapper {
 
 	protected void setStatus(Status val) {
 		status.set(val);
+		if (val == Status.stopped)
+			serverMonitor.requestHealthCheck();
 	}
 
 	protected void setSaveOff(boolean val) {

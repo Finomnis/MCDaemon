@@ -4,6 +4,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.finomnis.mcdaemon.downloaders.MCDownloader;
+import org.finomnis.mcdaemon.server.wrapper.ServerWrapper;
 
 public class ServerMonitor implements Runnable{
 
@@ -20,7 +21,7 @@ public class ServerMonitor implements Runnable{
 
 	public ServerMonitor(MCDownloader mcDownloader) {
 		this.mcDownloader = mcDownloader;
-		this.serverWrapper = new ServerWrapper(this.mcDownloader);
+		this.serverWrapper = new ServerWrapper(this.mcDownloader, this);
 		this.tasks = new LinkedBlockingQueue<Task>();
 		this.tasks.add(Task.checkHealth);
 	}
@@ -30,6 +31,18 @@ public class ServerMonitor implements Runnable{
 		
 	}
 	
+	public void requestHealthCheck(){
+		if(!tasks.contains(Task.checkHealth))
+			tasks.add(Task.checkHealth);
+	}
 	
+	public void initShutdown(){
+		tasks.clear();
+		tasks.add(Task.stop);
+	}
+
+	public ServerWrapper getWrapper() {
+		return serverWrapper;
+	}
 
 }

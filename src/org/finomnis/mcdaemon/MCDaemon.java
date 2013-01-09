@@ -1,8 +1,5 @@
 package org.finomnis.mcdaemon;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -12,7 +9,7 @@ import org.finomnis.mcdaemon.downloaders.bukkit.BukkitDownloader;
 import org.finomnis.mcdaemon.downloaders.ftb.FTBDownloader;
 import org.finomnis.mcdaemon.downloaders.vanilla.VanillaDownloader;
 import org.finomnis.mcdaemon.server.ServerMonitor;
-import org.finomnis.mcdaemon.server.ServerWrapper;
+import org.finomnis.mcdaemon.server.wrapper.ServerWrapper;
 import org.finomnis.mcdaemon.tools.ConfigNotFoundException;
 import org.finomnis.mcdaemon.tools.Log;
 
@@ -24,9 +21,9 @@ public class MCDaemon {
 	private static MainConfigFile configFile = null;
 	private static MCDownloader mcDownloader = null;
 	private static ServerMonitor serverMonitor = null;
-	//
+	private static Thread serverMonitorThread = null;
 	private static ServerWrapper serverWrapper = null;
-	
+
 	public static void start() {
 		Log.out("Starting Daemon ...");
 
@@ -89,7 +86,7 @@ public class MCDaemon {
 
 	private static void initialize() {
 		try {
-			
+
 			// Load config file
 			configFile = new MainConfigFile();
 
@@ -109,15 +106,22 @@ public class MCDaemon {
 			}
 
 			mcDownloader.initialize();
-			
-			//ProcessBuilder pb = new ProcessBuilder(mcDownloader.getInvocationCommand());
-			//pb.directory(new File(mcDownloader.getFolderName()));
-			//Process proc = pb.start();
-			
-			//serverMonitor = new ServerMonitor(mcDownloader);
-			serverWrapper = new ServerWrapper(mcDownloader);			
+
+			// ProcessBuilder pb = new
+			// ProcessBuilder(mcDownloader.getInvocationCommand());
+			// pb.directory(new File(mcDownloader.getFolderName()));
+			// Process proc = pb.start();
+
+			serverMonitor = new ServerMonitor(mcDownloader);
+			serverWrapper = serverMonitor.getWrapper();
+			serverMonitorThread = new Thread(serverMonitor);
+			serverMonitorThread.start();
+
 			serverWrapper.startServer();
-			
+			Thread.sleep(20000);
+			serverWrapper.stopServer();
+			Thread.sleep(3000);
+			serverWrapper.startServer();
 		} catch (Exception e) {
 			Log.err(e);
 			throw new RuntimeException("Unable to initialize");
@@ -125,25 +129,38 @@ public class MCDaemon {
 
 	}
 
+	public static void kill() {
+		if (serverWrapper != null)
+			serverWrapper.killServer();
+	}
+
 	private static void terminate() {
 
-		if(serverWrapper != null)
+		if (serverMonitor != null) {
+			serverMonitor.initShutdown();
+			try {
+				serverMonitorThread.join(70000);
+			} catch (InterruptedException e) {
+				Log.warn(e);
+			}
+		}
+
+		if (serverWrapper != null)
 			serverWrapper.shutdown();
-		
+
 	}
-	
-	public static String getConfig(String config) throws ConfigNotFoundException
-	{
-	
+
+	public static String getConfig(String config)
+			throws ConfigNotFoundException {
+
 		return configFile.getConfig(config);
-		
+
 	}
-	
-	public static ServerMonitor getServerMonitor()
-	{
-		
+
+	public static ServerMonitor getServerMonitor() {
+
 		return serverMonitor;
-		
+
 	}
 
 }

@@ -13,6 +13,14 @@ public class Main implements org.apache.commons.daemon.Daemon{
 		
 		try{
 			
+			Thread killThread = new Thread() {
+			    public void run() {
+			        MCDaemon.kill();
+			    }
+			};
+
+			Runtime.getRuntime().addShutdownHook(killThread); 
+			
 			MCDaemon.start();
 			
 			Scanner sc = new Scanner(System.in);
