@@ -125,7 +125,11 @@ public class MCDaemon {
 			serverMonitorThread.start();
 
 			taskScheduler.addTask(new HealthCheckTask());
-			taskScheduler.addTask(new UpdateTask());
+			
+			boolean autoPatcherEnabled = Boolean.parseBoolean(configFile.getConfig("autoPatcherEnabled"));
+			if(autoPatcherEnabled)
+				taskScheduler.addTask(new UpdateTask(mcDownloader));
+			
 			taskSchedulerThread = new Thread(taskScheduler);
 			taskSchedulerThread.start();
 			/*

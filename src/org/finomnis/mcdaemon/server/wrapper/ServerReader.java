@@ -104,7 +104,7 @@ public class ServerReader implements Runnable{
 		//Log.err(msg);
 		if(msg.matches(".*\\[INFO\\] Done \\(\\d*\\.\\d*s\\)\\! For help\\, type \\\"help\\\".*\\n?"))
 		{	// Server start
-			Log.out("Server started.");
+			Log.out("Server running.");
 			serverWrapper.setStatus(Status.running);
 		}
 		else if (msg.matches(".*\\[INFO\\] Seed: \\-?\\d*\\n?"))

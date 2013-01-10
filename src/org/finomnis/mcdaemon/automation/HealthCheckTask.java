@@ -16,6 +16,7 @@ public class HealthCheckTask implements Task {
 	}
 
 	public HealthCheckTask() throws NumberFormatException, ConfigNotFoundException {
+		timeDiff = Integer.parseInt(MCDaemon.getConfig("crashTestInterval"));
 		nextUpdate = new Date();
 		reniewNextUpdate();
 	}

@@ -12,6 +12,8 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import com.twmacinta.util.MD5;
+
 public class FileTools {
 
 	public static FileWriter openFileWriteText(File f, boolean append) throws IOException
@@ -43,7 +45,7 @@ public class FileTools {
 	public static void writeFromStream(InputStream iStream, OutputStream fWriter) throws IOException
 	{
 		
-		byte[] buf = new byte[2048];
+		byte[] buf = new byte[524288];
 		
 		while(true)
 		{
@@ -84,6 +86,7 @@ public class FileTools {
 	
 	public static String md5(byte[] data) throws CriticalException {
 
+		/*
 		MessageDigest md5Calculator;
 		try {
 			md5Calculator = MessageDigest.getInstance("MD5");
@@ -94,6 +97,15 @@ public class FileTools {
 		BigInteger md5Value = new BigInteger(1, md5Calculator.digest(data));
 
 		return md5Value.toString(16);
+		*/
+		
+		MD5 md5 = new MD5();
+		md5.Init();
+		
+		md5.Update(data);
+		
+		return md5.asHex();
+		
 	}
 	
 	public static String md5(String str) throws CriticalException {
@@ -104,11 +116,13 @@ public class FileTools {
 	
 	public static String md5(File f) throws IOException, CriticalException{
 		
+		/*
 		InputStream iStream = openFileRead(f);
 		String md5String = md5(iStream);
 		iStream.close();
 		return md5String;
-		
+		*/
+		return MD5.asHex(MD5.getHash(f));
 	}
 	
 	public static void copyFile(String inFile, String outFile) throws IOException
@@ -125,14 +139,14 @@ public class FileTools {
 	
 	public static String md5(InputStream iStream) throws IOException, CriticalException{
 		
-		MessageDigest md5Calculator;
+		/*MessageDigest md5Calculator;
 		try {
 			md5Calculator = MessageDigest.getInstance("MD5");
 		} catch (NoSuchAlgorithmException e) {
 			throw new CriticalException("Unable to initialize MD5 calculator!");
 		}
 				
-		byte[] input = new byte[2048];
+		byte[] input = new byte[524288];
 		
 		while(true)
 		{
@@ -146,6 +160,23 @@ public class FileTools {
 		BigInteger md5Value = new BigInteger(1, md5Calculator.digest());
 
 		return md5Value.toString(16);
+		*/
+		
+		MD5 md5 = new MD5();
+		md5.Init();
+		
+		byte[] input = new byte[524288];
+		
+		while(true)
+		{
+		
+			int len = iStream.read(input);
+			if(len < 0) break;
+			md5.Update(input, len);
+					
+		}
+		
+		return md5.asHex();
 		
 	}
 

@@ -45,7 +45,7 @@ public class VanillaDownloader implements MCDownloader {
 		newJar.close();
 		
 		if(10 > FileTools.fileSize(newJarName))
-			throw new CriticalException("Unable to download server jar!");
+			throw new CriticalException("Unable to download server executable!");
 				
 	}
 	
@@ -78,7 +78,7 @@ public class VanillaDownloader implements MCDownloader {
 	@Override
 	public void update() throws IOException, CriticalException {
 		
-		Log.out("Updating server jar.");
+		Log.out("Downloading server executable...");
 		
 		downloadNewJar();
 		

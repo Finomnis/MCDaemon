@@ -3,6 +3,7 @@ package org.finomnis.mcdaemon.automation;
 import java.util.Date;
 
 import org.finomnis.mcdaemon.MCDaemon;
+import org.finomnis.mcdaemon.downloaders.MCDownloader;
 import org.finomnis.mcdaemon.tools.ConfigNotFoundException;
 import org.finomnis.mcdaemon.tools.Log;
 
@@ -10,16 +11,17 @@ public class UpdateTask implements Task {
 
 	long timeDiff;
 	Date nextUpdate;
+	MCDownloader mcDownloader;
 	
 	private void reniewNextUpdate(){
 		Date now = new Date();
 		nextUpdate = new Date(now.getTime() + timeDiff*60000);
 	}
 	
-	public UpdateTask() throws NumberFormatException, ConfigNotFoundException{
+	public UpdateTask(MCDownloader mcDownloader) throws NumberFormatException, ConfigNotFoundException{
+		this.mcDownloader = mcDownloader;
 		timeDiff = Long.parseLong(MCDaemon.getConfig("autoPatcherInterval"));
-		nextUpdate = new Date();
-		reniewNextUpdate();
+		nextUpdate = new Date(new Date().getTime() + 30000);
 	}
 	
 	@Override
@@ -34,8 +36,15 @@ public class UpdateTask implements Task {
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-		Log.out("!!!UPDATE!!!");
+		Log.debug("Checking for update...");
+		if(mcDownloader.updateAvailable())
+		{
+			Log.out("!!!UPDATE!!!");
+		}
+		else
+		{
+			Log.debug("Already at newest version.");
+		}
 	}
 
 }
