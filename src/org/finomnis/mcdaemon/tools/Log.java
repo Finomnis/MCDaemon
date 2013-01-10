@@ -15,7 +15,7 @@ public class Log {
 	public static void debug(String msg)
 	{
 		
-		System.out.println(format("[d] " + msg));
+		//System.out.println(format("[d] " + msg));
 		
 	}
 	

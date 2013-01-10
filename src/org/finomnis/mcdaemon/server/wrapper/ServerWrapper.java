@@ -2,6 +2,7 @@ package org.finomnis.mcdaemon.server.wrapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -34,6 +35,8 @@ public class ServerWrapper {
 	private MCDownloader mcDownloader;
 	private ServerMonitor serverMonitor;
 
+	private Date lastStartTime = null;
+	
 	public ServerWrapper(MCDownloader mcDownloader, ServerMonitor serverMonitor) {
 		this.mcDownloader = mcDownloader;
 		this.serverMonitor = serverMonitor;
@@ -80,7 +83,9 @@ public class ServerWrapper {
 			serverProcess = pb.start();
 			stdIn.setStream(serverProcess.getOutputStream());
 			stdOut.setStream(serverProcess.getInputStream());
+			
 			status.set(Status.starting);
+			lastStartTime = new Date();
 			stillAlive.set(true);
 			saveOff.set(false);
 		} finally {
@@ -108,11 +113,12 @@ public class ServerWrapper {
 			status.set(Status.stopped);
 		} finally {
 			serverLock.unlock();
+			Log.out("Server stopped.");
 		}
 	}
 
 	public synchronized void shutdown() {
-		Log.out("Shutting down server wrapper...");
+		Log.out("Shutting down serverWrapper...");
 		serverLock.lock();
 		try {
 			if (!shutdownRequested.get()) {
@@ -159,6 +165,10 @@ public class ServerWrapper {
 		stillAlive.set(false);
 		stdIn.write("seed");
 		return stillAlive.waitForValue(true, 20000);
+	}
+	
+	public Date getLastStartTime(){
+		return lastStartTime;
 	}
 
 }

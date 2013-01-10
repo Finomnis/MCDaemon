@@ -1,5 +1,6 @@
 package org.finomnis.mcdaemon.server;
 
+import java.util.Date;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -41,14 +42,23 @@ public class ServerMonitor implements Runnable{
 			
 			switch(task){
 			case stop:
+				Log.debug("serverMonitor caught stopmessage.");
 				serverWrapper.shutdown();
 				return;
 			case checkHealth:
+				Log.debug("Running health check...");
 				switch(serverWrapper.getStatus()){
 				case stopped:
 					tryStartServer();
 					break;
 				case starting:
+					Date startupTime = serverWrapper.getLastStartTime();
+					Date now = new Date();
+					if(now.getTime() - startupTime.getTime() > 180000)
+					{
+						serverWrapper.stopServer();
+						tryStartServer();
+					}
 					break;
 				case running:
 					if(!serverWrapper.stillAliveTest())

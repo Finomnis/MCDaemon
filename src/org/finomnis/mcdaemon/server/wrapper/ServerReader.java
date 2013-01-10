@@ -101,7 +101,7 @@ public class ServerReader implements Runnable{
 	}
 
 	private void processMessage(String msg) {
-		Log.err(msg);
+		//Log.err(msg);
 		if(msg.matches(".*\\[INFO\\] Done \\(\\d*\\.\\d*s\\)\\! For help\\, type \\\"help\\\".*\\n?"))
 		{	// Server start
 			Log.out("Server started.");

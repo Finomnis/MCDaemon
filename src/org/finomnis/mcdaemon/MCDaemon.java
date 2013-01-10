@@ -4,6 +4,9 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.finomnis.mcdaemon.automation.HealthCheckTask;
+import org.finomnis.mcdaemon.automation.TaskScheduler;
+import org.finomnis.mcdaemon.automation.UpdateTask;
 import org.finomnis.mcdaemon.downloaders.MCDownloader;
 import org.finomnis.mcdaemon.downloaders.bukkit.BukkitDownloader;
 import org.finomnis.mcdaemon.downloaders.ftb.FTBDownloader;
@@ -23,6 +26,8 @@ public class MCDaemon {
 	private static ServerMonitor serverMonitor = null;
 	private static Thread serverMonitorThread = null;
 	private static ServerWrapper serverWrapper = null;
+	private static TaskScheduler taskScheduler = null;
+	private static Thread taskSchedulerThread = null;
 
 	public static void start() {
 		Log.out("Starting Daemon ...");
@@ -90,6 +95,8 @@ public class MCDaemon {
 			// Load config file
 			configFile = new MainConfigFile();
 
+			taskScheduler = new TaskScheduler();
+
 			// Load Minecraft Downloader
 			switch (configFile.getConfig("mcEdition")) {
 			case "ftb":
@@ -117,13 +124,15 @@ public class MCDaemon {
 			serverMonitorThread = new Thread(serverMonitor);
 			serverMonitorThread.start();
 
+			taskScheduler.addTask(new HealthCheckTask());
+			taskScheduler.addTask(new UpdateTask());
+			taskSchedulerThread = new Thread(taskScheduler);
+			taskSchedulerThread.start();
 			/*
-			serverWrapper.startServer();
-			Thread.sleep(20000);
-			serverWrapper.stopServer();
-			Thread.sleep(3000);
-			serverWrapper.startServer();
-			*/
+			 * serverWrapper.startServer(); Thread.sleep(20000);
+			 * serverWrapper.stopServer(); Thread.sleep(3000);
+			 * serverWrapper.startServer();
+			 */
 		} catch (Exception e) {
 			Log.err(e);
 			throw new RuntimeException("Unable to initialize");
@@ -138,11 +147,23 @@ public class MCDaemon {
 
 	private static void terminate() {
 
+		Log.out("Shutting down taskScheduler...");
+		if (taskScheduler != null) {
+			taskScheduler.requestShutdown();
+			try {
+				if (taskSchedulerThread != null)
+					taskSchedulerThread.join();
+			} catch (InterruptedException e) {
+				Log.warn(e);
+			}
+		}
+
+		Log.out("Shutting down serverMonitor...");
 		if (serverMonitor != null) {
 			serverMonitor.initShutdown();
 			try {
-				if(serverMonitorThread != null)
-				serverMonitorThread.join();
+				if (serverMonitorThread != null)
+					serverMonitorThread.join();
 			} catch (InterruptedException e) {
 				Log.warn(e);
 			}
@@ -157,10 +178,8 @@ public class MCDaemon {
 
 	}
 
-	public static ServerMonitor getServerMonitor() {
-
-		return serverMonitor;
-
+	public static void scheduleHealthCheck() {
+		serverMonitor.requestHealthCheck();
 	}
 
 }

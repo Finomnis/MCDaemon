@@ -33,6 +33,10 @@ public class Main implements org.apache.commons.daemon.Daemon{
 			MCDaemon.stop();
 			MCDaemon.waitForTermination();
 			
+			Runtime.getRuntime().removeShutdownHook(killThread);
+			
+			Log.out("Daemon shut down. Program ended.");
+			
 		}
 		catch(Exception e)
 		{
