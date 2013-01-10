@@ -1,7 +1,7 @@
 MCDaemon
 ========
 
-A Java Daemon for automatic Minecraft server maintenance
+A Java Daemon for automated Minecraft server maintenance
 
 _-- WORK IN PROGRESS --_
 
