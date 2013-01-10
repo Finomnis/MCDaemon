@@ -11,6 +11,7 @@ public class TaskScheduler implements Runnable{
 	private List<Task> taskList = new LinkedList<Task>();
 	private Thread schedulerThread = null;
 	private volatile boolean shutdownRequested = false;
+	private volatile boolean shutdownAccepted = false;
 	
 	public TaskScheduler(){
 		
@@ -22,7 +23,15 @@ public class TaskScheduler implements Runnable{
 	
 	public void requestShutdown(){
 		shutdownRequested = true;
-		schedulerThread.interrupt();
+		while(!shutdownAccepted)
+		{
+			schedulerThread.interrupt();
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				Log.warn(e);
+			}
+		}
 	}
 	
 	@Override
@@ -31,7 +40,10 @@ public class TaskScheduler implements Runnable{
 		
 		while(true){
 			if(shutdownRequested)
+			{
+				shutdownAccepted = true;
 				return;
+			}
 			
 			long sleepingTime = Long.MAX_VALUE;
 			long now = new Date().getTime();
