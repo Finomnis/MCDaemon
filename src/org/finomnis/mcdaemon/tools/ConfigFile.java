@@ -17,6 +17,10 @@ public abstract class ConfigFile {
 	private String fileName = "";
 
 	public ConfigFile() {
+
+	}
+	
+	public void init(){
 		values.clear();
 		defaultValues.clear();
 
@@ -50,6 +54,12 @@ public abstract class ConfigFile {
 					return true;
 				return false;
 			case ":path:":
+				if(value.length() < 2)
+					return false;
+				if (!value.startsWith("\"") || !value.endsWith("\""))
+					return false;
+				return true;
+			case ":string:":
 				if(value.length() < 2)
 					return false;
 				if (!value.startsWith("\"") || !value.endsWith("\""))
@@ -177,13 +187,19 @@ public abstract class ConfigFile {
 						printValidValues = false;
 				
 				if (validValues != null && printValidValues) {
-					if (!configDescription.equals(""))
+					/*if (!configDescription.equals(""))
 						configDescription += "\n";
 					configDescription += "  Valid values: ";
 					for (int i = 0; i < validValues.length; i++) {
 						if (i != 0)
 							configDescription += ", ";
 						configDescription += "'" + validValues[i] + "'";
+					}*/
+					if (!configDescription.equals(""))
+						configDescription += "\n";
+					configDescription += "  Valid values:\n";
+					for(String validValue : validValues){
+						configDescription += "     - " + validValue + "\n";
 					}
 				}
 

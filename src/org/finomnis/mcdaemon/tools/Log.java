@@ -29,7 +29,7 @@ public class Log {
 	public static void warn(Exception e)
 	{
 		
-		System.err.println(format("WARNING: " + e.getMessage()));
+		System.err.println(format("WARNING: " + e.toString()));
 		for(StackTraceElement tr : e.getStackTrace())
 		{
 			System.err.println("   " + tr);
@@ -39,7 +39,7 @@ public class Log {
 	public static void err(Exception e)
 	{
 		
-		System.err.println(format("ERROR: " + e.getMessage()));
+		System.err.println(format("ERROR: " + e.toString()));
 		for(StackTraceElement tr : e.getStackTrace())
 		{
 			System.err.println("   " + tr);

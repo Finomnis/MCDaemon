@@ -94,7 +94,8 @@ public class MCDaemon {
 
 			// Load config file
 			configFile = new MainConfigFile();
-
+			configFile.init();
+			
 			taskScheduler = new TaskScheduler();
 
 			// Load Minecraft Downloader
