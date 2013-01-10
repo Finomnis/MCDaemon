@@ -65,7 +65,10 @@ public class ServerWriter implements Runnable {
 				try {
 					if (stream != null) {
 						try {
+							stream.write((int) ('\r'));
+							stream.write((int) ('\n'));
 							stream.write(command.getBytes());
+							stream.write((int) ('\r'));
 							stream.write((int) ('\n'));
 							stream.flush();
 						} catch (IOException e) {

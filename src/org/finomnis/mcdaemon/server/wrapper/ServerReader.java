@@ -101,7 +101,18 @@ public class ServerReader implements Runnable{
 	}
 
 	private void processMessage(String msg) {
-		Log.out(msg);		
+		Log.err(msg);
+		if(msg.matches(".*\\[INFO\\] Done \\(\\d*\\.\\d*s\\)\\! For help\\, type \\\"help\\\".*\\n?"))
+		{	// Server start
+			Log.out("Server started.");
+			serverWrapper.setStatus(Status.running);
+		}
+		else if (msg.matches(".*\\[INFO\\] Seed: \\-?\\d*\\n?"))
+		{	// Seed message
+			Log.debug("StillAliveMessage caught.");
+			serverWrapper.setStillAlive(true);
+		}
+		
 	}
 	
 	

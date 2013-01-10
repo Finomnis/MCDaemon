@@ -117,11 +117,13 @@ public class MCDaemon {
 			serverMonitorThread = new Thread(serverMonitor);
 			serverMonitorThread.start();
 
+			/*
 			serverWrapper.startServer();
 			Thread.sleep(20000);
 			serverWrapper.stopServer();
 			Thread.sleep(3000);
 			serverWrapper.startServer();
+			*/
 		} catch (Exception e) {
 			Log.err(e);
 			throw new RuntimeException("Unable to initialize");
@@ -139,14 +141,12 @@ public class MCDaemon {
 		if (serverMonitor != null) {
 			serverMonitor.initShutdown();
 			try {
-				serverMonitorThread.join(70000);
+				if(serverMonitorThread != null)
+				serverMonitorThread.join();
 			} catch (InterruptedException e) {
 				Log.warn(e);
 			}
 		}
-
-		if (serverWrapper != null)
-			serverWrapper.shutdown();
 
 	}
 

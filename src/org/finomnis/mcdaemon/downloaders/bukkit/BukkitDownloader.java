@@ -115,6 +115,7 @@ public class BukkitDownloader implements MCDownloader {
 
 		arguments.add("-jar");
 		arguments.add(serverName);
+		arguments.add("--nojline");
 
 		return arguments;
 	}

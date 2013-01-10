@@ -5,6 +5,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.finomnis.mcdaemon.downloaders.MCDownloader;
 import org.finomnis.mcdaemon.server.wrapper.ServerWrapper;
+import org.finomnis.mcdaemon.tools.Log;
 
 public class ServerMonitor implements Runnable{
 
@@ -12,6 +13,7 @@ public class ServerMonitor implements Runnable{
 		checkHealth,
 		save_off,
 		save_on,
+		restart,
 		stop
 	}
 	
@@ -28,7 +30,55 @@ public class ServerMonitor implements Runnable{
 
 	@Override
 	public void run() {
-		
+		Task task;
+		while(true){
+			try {
+				task = tasks.take();
+			} catch (InterruptedException e) {
+				Log.warn(e);
+				continue;
+			}
+			
+			switch(task){
+			case stop:
+				serverWrapper.shutdown();
+				return;
+			case checkHealth:
+				switch(serverWrapper.getStatus()){
+				case stopped:
+					tryStartServer();
+					break;
+				case starting:
+					break;
+				case running:
+					if(!serverWrapper.stillAliveTest())
+					{
+						serverWrapper.stopServer();
+						tryStartServer();
+					}
+				default:
+					break;
+				}
+				continue;	
+			case restart:
+				serverWrapper.stopServer();
+				tryStartServer();
+			default:
+				continue;			
+			}
+			
+			
+			
+		}
+	}
+	
+	private void tryStartServer(){
+		try {
+			serverWrapper.startServer();
+		} catch (Exception e) {
+			Log.err("Unable to start server!");
+			Log.err(e);
+		}		
 	}
 	
 	public void requestHealthCheck(){

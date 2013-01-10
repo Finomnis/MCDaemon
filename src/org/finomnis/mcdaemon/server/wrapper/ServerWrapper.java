@@ -15,7 +15,7 @@ import org.finomnis.mcdaemon.tools.SyncVar;
 public class ServerWrapper {
 
 	public enum Status {
-		running, stopped
+		running, stopped, starting
 	};
 
 	private Lock serverLock;
@@ -80,7 +80,7 @@ public class ServerWrapper {
 			serverProcess = pb.start();
 			stdIn.setStream(serverProcess.getOutputStream());
 			stdOut.setStream(serverProcess.getInputStream());
-			status.set(Status.running);
+			status.set(Status.starting);
 			stillAlive.set(true);
 			saveOff.set(false);
 		} finally {
@@ -92,11 +92,16 @@ public class ServerWrapper {
 		Log.out("Stopping server...");
 		serverLock.lock();
 		try {
-			stdIn.write("stop");
-			if (!status.waitForValue(Status.stopped, 60000)) {
-				serverProcess.destroy();
+			if (status.get() != Status.stopped) {
+				stdIn.write("stop");
 				if (!status.waitForValue(Status.stopped, 10000)) {
-					Log.err("Unable to stop server!");
+					stdIn.write("stop");
+					if (!status.waitForValue(Status.stopped, 20000)) {
+						serverProcess.destroy();
+						if (!status.waitForValue(Status.stopped, 10000)) {
+							Log.err("Unable to stop server!");
+						}
+					}
 				}
 			}
 			serverProcess = null;
@@ -144,6 +149,16 @@ public class ServerWrapper {
 
 	protected void setSaveOff(boolean val) {
 		saveOff.set(val);
+	}
+
+	public Status getStatus() {
+		return status.get();
+	}
+
+	public boolean stillAliveTest() {
+		stillAlive.set(false);
+		stdIn.write("seed");
+		return stillAlive.waitForValue(true, 20000);
 	}
 
 }
