@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.finomnis.mcdaemon.MCDaemon;
 import org.finomnis.mcdaemon.downloaders.MCDownloader;
 import org.finomnis.mcdaemon.server.ServerMonitor;
+import org.finomnis.mcdaemon.tools.ConfigNotFoundException;
 import org.finomnis.mcdaemon.tools.CriticalException;
 import org.finomnis.mcdaemon.tools.Log;
 import org.finomnis.mcdaemon.tools.SyncVar;
@@ -19,6 +21,8 @@ public class ServerWrapper {
 		running, stopped, starting
 	};
 
+	private long shutdownTimeout = 30;
+	
 	private Lock serverLock;
 
 	private SyncVar<Boolean> stillAlive;
@@ -42,6 +46,12 @@ public class ServerWrapper {
 		this.mcDownloader = mcDownloader;
 		this.serverMonitor = serverMonitor;
 
+		try {
+			shutdownTimeout = Integer.parseInt(MCDaemon.getConfig("crashTestShutdownTimeout"));
+		} catch (NumberFormatException | ConfigNotFoundException e) {
+			Log.warn(e);
+		}
+		
 		serverLock = new ReentrantLock();
 
 		stillAlive = new SyncVar<Boolean>(false);
@@ -111,7 +121,7 @@ public class ServerWrapper {
 						} catch (InterruptedException e) {
 							Log.warn(e);
 						}
-						if (getServerInactiveTime() > 30000) {
+						if (getServerInactiveTime() > shutdownTimeout * 1000) {
 							break;
 						}
 					}

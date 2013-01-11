@@ -14,6 +14,9 @@ import org.finomnis.mcdaemon.tools.SyncVar;
 
 public class ServerMonitor implements Runnable {
 
+	private static long startupTimeout = 120;
+	
+	
 	private enum Task {
 		checkHealth, save_off, save_on, restart, shutdown
 	}
@@ -26,6 +29,11 @@ public class ServerMonitor implements Runnable {
 	private volatile SyncVar<Status> acceptedStatus = new SyncVar<Status>(Status.running);
 
 	public ServerMonitor(MCDownloader mcDownloader) {
+		try {
+			startupTimeout = Integer.parseInt(MCDaemon.getConfig("crashTestStartupTimeout"));
+		} catch (NumberFormatException | ConfigNotFoundException e) {
+			Log.warn(e);
+		}
 		this.mcDownloader = mcDownloader;
 		this.serverWrapper = new ServerWrapper(this.mcDownloader, this);
 		this.tasks = new LinkedBlockingQueue<Task>();
@@ -99,7 +107,7 @@ public class ServerMonitor implements Runnable {
 			tryStartServer();
 			break;
 		case starting:
-			if (serverWrapper.getServerInactiveTime() > 60000) {
+			if (serverWrapper.getServerInactiveTime() > startupTimeout * 1000) {
 				Log.out("Server seems like it crashed during startup. Restarting server ...");
 				serverWrapper.stopServer();
 				tryStartServer();

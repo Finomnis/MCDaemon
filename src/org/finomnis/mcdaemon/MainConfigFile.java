@@ -16,6 +16,8 @@ public class MainConfigFile extends ConfigFile {
 		configs.put("serverMemory", "1024");
 		configs.put("seedCrashTestEnabled", "true");
 		configs.put("crashTestInterval", "30");
+		configs.put("crashTestStartupTimeout", "120");
+		configs.put("crashTestShutdownTimeout", "30");
 		configs.put("autoPatcherEnabled", "true");
 	}
 
@@ -46,6 +48,10 @@ public class MainConfigFile extends ConfigFile {
 			return "Enables/disables crash testing by checking the response of the 'seed' command.";
 		case "crashTestInterval":
 			return "In which intervall to run the crashTest. (in seconds)";
+		case "crashTestStartupTimeout":
+			return "The time after an inactive server during startup gets detected as being crashed. (in seconds)";
+		case "crashTestShutdownTimeout":
+			return "The time after an inactive server during shutdown gets detected as being crashed. (in seconds)";
 		default:
 			return "No description available.";
 		}				
@@ -72,6 +78,10 @@ public class MainConfigFile extends ConfigFile {
 		case "seedCrashTestEnabled":
 			return new String[]{":bool:"};
 		case "crashTestInterval":
+			return new String[]{":int:"};
+		case "crashTestStartupTimeout":
+			return new String[]{":int:"};
+		case "crashTestShutdownTimeout":
 			return new String[]{":int:"};
 		default:
 			return null;

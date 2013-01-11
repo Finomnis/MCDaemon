@@ -13,6 +13,12 @@ public class Main implements org.apache.commons.daemon.Daemon{
 		
 		try{
 			
+			for(String arg : args)
+			{
+				if(arg.equals("-v"))
+					Log.setVerbose();
+			}
+			
 			Thread killThread = new Thread() {
 			    public void run() {
 			        MCDaemon.kill();

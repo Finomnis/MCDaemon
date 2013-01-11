@@ -5,6 +5,12 @@ import java.util.Date;
 
 public class Log {
 
+	private static boolean verbose = false;
+	
+	public static void setVerbose(){
+		verbose = true;
+	}
+	
 	public static void out(String msg) {
 
 		System.out.println(format(msg));
@@ -12,8 +18,9 @@ public class Log {
 	}
 
 	public static void debug(String msg) {
-
-		// System.out.println(format("[d] " + msg));
+		
+		if(verbose)
+			System.out.println(format("[d] " + msg));
 
 	}
 
@@ -49,7 +56,9 @@ public class Log {
 	}
 
 	public static void serverMessage(String msg) {
-		/*
+		if(!verbose)
+			return;
+		
 		if (msg.matches("\\d{4}\\-\\d{2}\\-\\d{2} \\d{2}\\:\\d{2}\\:\\d{2} .*\\n?")) {
 			try {
 				msg = msg.substring(20);
@@ -57,8 +66,9 @@ public class Log {
 				warn(e);
 			}
 		}
+		
 		System.err.println(format("[SERVER] " + msg));
-		*/
+		
 	}
 
 }
