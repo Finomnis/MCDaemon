@@ -135,7 +135,7 @@ public class MCDaemon {
 			
 			boolean autoBackupEnabled = Boolean.parseBoolean(configFile.getConfig("backupEnabled"));
 			if(autoBackupEnabled)
-				taskScheduler.addTask(new BackupTask(serverWrapper));
+				taskScheduler.addTask(new BackupTask(serverMonitor));
 			
 			taskSchedulerThread = new Thread(taskScheduler);
 			taskSchedulerThread.start();

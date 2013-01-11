@@ -10,6 +10,7 @@ public class SyncVar<X> {
 	private X val;
 	private Lock lock = new ReentrantLock();
 	private Condition condition = lock.newCondition();
+	private Date lastChangeDate = new Date();
 	
 	public SyncVar(X val){
 		lock.lock();
@@ -30,9 +31,19 @@ public class SyncVar<X> {
 	public void set(X val)
 	{
 		lock.lock();
+		if(!this.val.equals(val))
+			lastChangeDate = new Date();
 		this.val = val;
 		condition.signalAll();
 		lock.unlock();
+	}
+	
+	public Date getLastChangeDate()
+	{
+		lock.lock();
+		Date ret = lastChangeDate;
+		lock.unlock();
+		return ret;		
 	}
 	
 	public void waitForValue(X val)

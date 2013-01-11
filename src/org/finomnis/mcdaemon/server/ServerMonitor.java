@@ -1,5 +1,6 @@
 package org.finomnis.mcdaemon.server;
 
+import java.util.Date;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -153,6 +154,30 @@ public class ServerMonitor implements Runnable {
 
 	public ServerWrapper getWrapper() {
 		return serverWrapper;
+	}
+	
+	public boolean setSaveOff(){
+		return serverWrapper.setSaveOff();
+	}
+	
+	public void setSaveOn(){
+		// Additional Healthcheck
+		Date startDate = new Date();
+		Status serverStatus = serverWrapper.getStatus();
+		// Save-off check at save-on function to prevent restarting of server while backing up
+		if(serverWrapper.getSaveOff() == false && serverStatus == Status.running && serverWrapper.getLastStatusChangeDate().getTime() < startDate.getTime() - 10000)
+		{
+			Log.out("Unable to set server to save-off mode. Server seems to have crashed. Restarting server ...");
+			tasks.add(Task.restart);
+			return;
+		}
+		if(serverWrapper.setSaveOn())
+			return;
+		if(serverStatus == Status.running && serverWrapper.getLastStatusChangeDate().getTime() < startDate.getTime() - 1000)
+		{
+			Log.out("Unable to set server to save-on mode. Server seems to have crashed. Restarting server ...");
+			tasks.add(Task.restart);
+		}
 	}
 
 }

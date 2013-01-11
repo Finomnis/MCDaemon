@@ -197,14 +197,24 @@ public class ServerWrapper {
 		
 	}
 
+	public Date getLastStatusChangeDate()
+	{
+		return status.getLastChangeDate();
+	}
+	
 	public boolean setSaveOff(){
 		stdIn.write("save-off");
 		stdIn.write("save-all");
 		return saveOff.waitForValue(true, 30000);
 	}
 	
-	public void setSaveOn(){
+	public boolean setSaveOn(){
 		stdIn.write("save-on");
+		return saveOff.waitForValue(false, 30000);
+	}
+
+	public boolean getSaveOff() {
+		return saveOff.get();
 	}
 	
 }

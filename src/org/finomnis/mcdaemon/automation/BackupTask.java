@@ -3,7 +3,7 @@ package org.finomnis.mcdaemon.automation;
 import java.util.Date;
 
 import org.finomnis.mcdaemon.MCDaemon;
-import org.finomnis.mcdaemon.server.wrapper.ServerWrapper;
+import org.finomnis.mcdaemon.server.ServerMonitor;
 import org.finomnis.mcdaemon.tools.ConfigNotFoundException;
 import org.finomnis.mcdaemon.tools.Log;
 
@@ -11,7 +11,7 @@ public class BackupTask implements Task {
 
 	long timeDiff;
 	Date nextUpdate;
-	ServerWrapper serverWrapper;
+	ServerMonitor serverMonitor;
 	
 	
 	private void reniewNextUpdate(){
@@ -19,9 +19,9 @@ public class BackupTask implements Task {
 		nextUpdate = new Date(now.getTime() + timeDiff*60000);
 	}
 	
-	public BackupTask(ServerWrapper serverWrapper) throws NumberFormatException, ConfigNotFoundException
+	public BackupTask(ServerMonitor serverMonitor) throws NumberFormatException, ConfigNotFoundException
 	{
-		this.serverWrapper = serverWrapper;
+		this.serverMonitor = serverMonitor;
 		timeDiff = Long.parseLong(MCDaemon.getConfig("backupInterval"));
 		reniewNextUpdate();
 	}
@@ -40,12 +40,12 @@ public class BackupTask implements Task {
 	public void run() {
 		Log.debug("Running backup task...");
 		
-		if(!serverWrapper.setSaveOff())
+		if(!serverMonitor.setSaveOff())
 			Log.err("Unable to set server to save-off state!");
 		
 		MCDaemon.runBackup();
 		
-		serverWrapper.setSaveOn();
+		serverMonitor.setSaveOn();
 
 	}
 
