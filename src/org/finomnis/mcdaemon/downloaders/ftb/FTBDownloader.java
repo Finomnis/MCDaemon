@@ -44,8 +44,16 @@ public class FTBDownloader implements MCDownloader {
 	
 	private boolean updatePrepared = false;
 
+	private String update_dirName;
+	private String update_version;
+	private String update_serverPack;
+	private String update_mcVersion;
+	private String update_modPackName;
+	
+	
 	private DocumentBuilder xmlDocumentBuilder = null;
 
+	
 	private NodeList getModPackList() throws SAXException, IOException,
 			CriticalException {
 		InputStream is = DownloadTools.openUrl(packListUrl);
@@ -54,9 +62,43 @@ public class FTBDownloader implements MCDownloader {
 		return modpackList.getElementsByTagName("modpack");
 	}
 
-	private void prepareUpdate(){
+	private void prepareUpdate() throws IOException, CriticalException, ParserConfigurationException, SAXException{
 		updatePrepared = false;
 		
+		update_modPackName = getModpackNameFromConfig();
+
+		String[] properties = getModPackInfos(update_modPackName);
+
+		update_dirName = properties[0];
+		update_version = properties[1];
+		update_serverPack = properties[2];
+		update_mcVersion = properties[3];
+
+		String downloadUrl = getModpackUrl(update_dirName, update_version, update_serverPack);
+
+		Log.out("Downloading \"" + update_modPackName + " v" + update_version + " ("
+				+ update_mcVersion + ")\" ...");
+		Log.debug("Downloading from \"" + downloadUrl + "\" ...");
+
+		OutputStream fStream = FileTools
+				.openFileWrite(serverZipName, false);
+		InputStream urlStream = DownloadTools.openUrl(downloadUrl);
+		FileTools.writeFromStream(urlStream, fStream);
+		fStream.close();
+		urlStream.close();
+
+		Log.debug("Calculating MD5...");
+		String zipMd5 = FileTools.md5(new File(serverZipName));
+		Log.debug("Zip MD5: '" + zipMd5 + "'");
+		Log.debug("Downloading validation MD5 ...");
+		String validationMd5 = getModpackMD5(update_dirName, update_version, update_serverPack);
+		Log.debug("Val MD5: '" + validationMd5 + "'");
+
+		if (!zipMd5.equals(validationMd5)) {
+			throw new CriticalException(
+					"Error downloading Modpack! (MD5 Checksum doesn't fit!");
+		}
+
 		
 		updatePrepared = true;
 	}
@@ -222,9 +264,7 @@ public class FTBDownloader implements MCDownloader {
 
 	}
 
-	@Override
-	public boolean updateAvailable() {
-
+	private boolean checkUpdateAvailable(){
 		if (!FileTools.fileExists(serverJarName))
 			return true;
 
@@ -243,7 +283,25 @@ public class FTBDownloader implements MCDownloader {
 		} catch (Exception e) {
 			Log.err(e);
 			return false;
+		}		
+	}
+	
+	@Override
+	public boolean updateAvailable() {
+
+		if(!checkUpdateAvailable())
+			return false;
+		
+		updatePrepared = false;
+		
+		try{
+			prepareUpdate();
+		} catch (Exception e) {
+			Log.err(e);
+			return false;
 		}
+		
+		return true;
 
 	}
 
@@ -274,51 +332,21 @@ public class FTBDownloader implements MCDownloader {
 	@Override
 	public void update() throws IOException, CriticalException {
 
-		if(!updatePrepared)
-			prepareUpdate();
-		updatePrepared = false;
+		
 		
 		try {
 
-			String modPackName = getModpackNameFromConfig();
-
-			String[] properties = getModPackInfos(modPackName);
-
-			String dirName = properties[0];
-			String version = properties[1];
-			String serverPack = properties[2];
-			String mcVersion = properties[3];
-
-			String downloadUrl = getModpackUrl(dirName, version, serverPack);
-
-			Log.out("Downloading \"" + modPackName + " v" + version + " ("
-					+ mcVersion + ")\" ...");
-			Log.debug("Downloading from \"" + downloadUrl + "\" ...");
-
-			OutputStream fStream = FileTools
-					.openFileWrite(serverZipName, false);
-			InputStream urlStream = DownloadTools.openUrl(downloadUrl);
-			FileTools.writeFromStream(urlStream, fStream);
-			fStream.close();
-			urlStream.close();
-
-			Log.debug("Calculating MD5...");
-			String zipMd5 = FileTools.md5(new File(serverZipName));
-			Log.debug("Zip MD5: '" + zipMd5 + "'");
-			Log.debug("Downloading validation MD5 ...");
-			String validationMd5 = getModpackMD5(dirName, version, serverPack);
-			Log.debug("Val MD5: '" + validationMd5 + "'");
-
-			if (!zipMd5.equals(validationMd5)) {
-				throw new CriticalException(
-						"Error downloading Modpack! (MD5 Checksum doesn't fit!");
-			}
-
+			if(!updatePrepared)
+				prepareUpdate();
+			updatePrepared = false;
+			
+			Log.debug("Delete coremods folder...");
 			if (FileTools.folderExists(folderName + "coremods/"))
 				if (!FileTools.delete(folderName + "coremods/"))
 					throw new CriticalException(
 							"Unable to delete coremods folder!");
-			;
+		
+			Log.debug("Delete mods folder...");
 			if (FileTools.folderExists(folderName + "mods/"))
 				if (!FileTools.delete(folderName + "mods/"))
 					throw new CriticalException("Unable to delete mods folder!");
@@ -326,10 +354,10 @@ public class FTBDownloader implements MCDownloader {
 			Log.out("Extracting server files...");
 			FileTools.unzip(serverZipName, folderName);
 
-			ftbStatusFile.setConfig("activeMCVersion", mcVersion);
-			ftbStatusFile.setConfig("activeModVersion", version);
-			ftbStatusFile.setConfig("activeModpack", modPackName);
-			setMOTD(modPackName, version, mcVersion);
+			ftbStatusFile.setConfig("activeMCVersion", update_mcVersion);
+			ftbStatusFile.setConfig("activeModVersion", update_version);
+			ftbStatusFile.setConfig("activeModpack", update_modPackName);
+			setMOTD(update_modPackName, update_version, update_mcVersion);
 
 		} catch (ConfigNotFoundException | ParserConfigurationException
 				| SAXException e) {
