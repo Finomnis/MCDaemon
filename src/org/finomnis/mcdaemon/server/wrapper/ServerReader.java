@@ -20,6 +20,7 @@ public class ServerReader implements Runnable{
 	private ServerWrapper serverWrapper = null;
 	private boolean shutdownRequested = false;
 	
+	private boolean saveOffCaught = false;
 	
 	public ServerReader(ServerWrapper serverWrapper)
 	{
@@ -107,11 +108,33 @@ public class ServerReader implements Runnable{
 		{	// Server start
 			Log.out("Server running.");
 			serverWrapper.setStatus(Status.running);
+			saveOffCaught = false;
 		}
 		else if (msg.matches(".*\\[INFO\\] Seed: \\-?\\d*\\n?"))
 		{	// Seed message
 			Log.debug("StillAliveMessage caught.");
 			serverWrapper.setStillAlive(true);
+		}
+		else if (msg.matches(".*\\[INFO\\] Turned off world auto\\-saving.*\\n?"))
+		{	// save-off
+			Log.debug("Save-off caught.");
+			saveOffCaught = true;
+		}
+		else if (msg.matches(".*\\[INFO\\] Saved the world.*\\n?"))
+		{	// save-all
+			Log.debug("Save-all caught.");
+			if(saveOffCaught)
+			{
+				serverWrapper.setSaveOff(true);
+				Log.debug("Server is now in backup mode.");
+			}
+		}
+		else if (msg.matches(".*\\[INFO\\] Turned on world auto\\-saving.*\\n?"))
+		{	// save-on
+			Log.debug("Save-on caught.");
+			serverWrapper.setSaveOff(false);
+			saveOffCaught = false;
+			Log.debug("Server is now not in backup mode.");
 		}
 		
 	}

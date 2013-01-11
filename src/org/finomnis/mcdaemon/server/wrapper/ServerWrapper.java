@@ -99,11 +99,13 @@ public class ServerWrapper {
 		Log.out("Stopping server...");
 		serverLock.lock();
 		try {
-			if (status.get() != Status.stopped) {
+			if (status.get() != Status.stopped && serverProcess != null) {
 				stdIn.write("stop");
 				if (!status.waitForValue(Status.stopped, 10000)) {
 					stdIn.write("stop");
 					while (status.get() != Status.stopped) {
+						if(status.get() == Status.starting)
+							break;
 						try {
 							Thread.sleep(100);
 						} catch (InterruptedException e) {
@@ -195,4 +197,14 @@ public class ServerWrapper {
 		
 	}
 
+	public boolean setSaveOff(){
+		stdIn.write("save-off");
+		stdIn.write("save-all");
+		return saveOff.waitForValue(true, 30000);
+	}
+	
+	public void setSaveOn(){
+		stdIn.write("save-on");
+	}
+	
 }

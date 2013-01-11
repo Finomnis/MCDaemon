@@ -23,7 +23,7 @@ public class UpdateTask implements Task {
 	public UpdateTask(MCDownloader mcDownloader) throws NumberFormatException, ConfigNotFoundException{
 		this.mcDownloader = mcDownloader;
 		timeDiff = Long.parseLong(MCDaemon.getConfig("autoPatcherInterval"));
-		nextUpdate = new Date(new Date().getTime() + 30000);
+		nextUpdate = new Date(new Date().getTime() + 120000);
 	}
 	
 	@Override
@@ -45,6 +45,7 @@ public class UpdateTask implements Task {
 			MCDaemon.enterMaintenanceMode();
 			try {
 				Log.out("Updating...");
+				MCDaemon.runBackup();
 				mcDownloader.update();
 				Log.out("Update successful. Starting server...");
 			} catch (IOException | CriticalException e) {

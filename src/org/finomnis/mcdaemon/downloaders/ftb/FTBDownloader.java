@@ -119,7 +119,10 @@ public class FTBDownloader implements MCDownloader {
 			update();
 		
 		if(!getModpackNameFromConfig().equals(getActiveModpackName()))
+		{
+			MCDaemon.runBackup();
 			update();
+		}
 		
 	}
 	

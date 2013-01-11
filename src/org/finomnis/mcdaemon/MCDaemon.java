@@ -4,6 +4,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.finomnis.mcdaemon.automation.BackupTask;
 import org.finomnis.mcdaemon.automation.HealthCheckTask;
 import org.finomnis.mcdaemon.automation.TaskScheduler;
 import org.finomnis.mcdaemon.automation.UpdateTask;
@@ -28,7 +29,8 @@ public class MCDaemon {
 	private static ServerWrapper serverWrapper = null;
 	private static TaskScheduler taskScheduler = null;
 	private static Thread taskSchedulerThread = null;
-
+	private static Lock backupLock = new ReentrantLock();
+	
 	public static void start() {
 		Log.out("Starting Daemon ...");
 
@@ -131,6 +133,10 @@ public class MCDaemon {
 			if(autoPatcherEnabled)
 				taskScheduler.addTask(new UpdateTask(mcDownloader));
 			
+			boolean autoBackupEnabled = Boolean.parseBoolean(configFile.getConfig("backupEnabled"));
+			if(autoBackupEnabled)
+				taskScheduler.addTask(new BackupTask(serverWrapper));
+			
 			taskSchedulerThread = new Thread(taskScheduler);
 			taskSchedulerThread.start();
 			/*
@@ -195,4 +201,24 @@ public class MCDaemon {
 		serverMonitor.exitMaintenanceMode();
 	}
 	
+	public static void runBackup(){
+		backupLock.lock();
+		try{
+			
+			boolean backupEnabled = Boolean.parseBoolean(configFile.getConfig("backupEnabled"));
+			if(backupEnabled)
+			{
+				Log.out("Running backup...");
+				ProcessBuilder pb = new ProcessBuilder(configFile.getConfig("backupScript"));
+				Process backupProcess = pb.start();
+				backupProcess.waitFor();	
+				Log.debug("Successfully backed up.");
+			}
+			
+		} catch (Exception e){
+			Log.err(e);			
+		}finally{
+			backupLock.unlock();
+		}
+	}
 }
