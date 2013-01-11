@@ -3,7 +3,7 @@ MCDaemon
 
 A Java Daemon for automated Minecraft server maintenance
 
-_-- WORK IN PROGRESS --_
+_-- Beta 0.1 released --_
 
 Features:
 ---------
@@ -25,5 +25,5 @@ Supported Modes:
 ----------------
 
 - Directly run jar as process (Platformindependant)
-- Run as Daemon via jsvc (Unix)
-- Run as Service via procrun (Windows)
+- [Upcoming] Run as Daemon via jsvc (Unix)
+- [Upcoming] Run as Service via procrun (Windows)
