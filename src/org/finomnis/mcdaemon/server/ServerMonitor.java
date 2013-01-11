@@ -1,6 +1,5 @@
 package org.finomnis.mcdaemon.server;
 
-import java.util.Date;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -51,13 +50,7 @@ public class ServerMonitor implements Runnable {
 					tryStartServer();
 					break;
 				case starting:
-					Date startupTime = serverWrapper.getLastStartTime();
-					if (startupTime == null) {
-						Log.debug("Server seems to just got started. No error so far.");
-						break;
-					}
-					Date now = new Date();
-					if (now.getTime() - startupTime.getTime() > 180000) {
+					if(serverWrapper.getServerInactiveTime() > 60000) {
 						Log.out("Server seems like it crashed during startup. Restarting server ...");
 						serverWrapper.stopServer();
 						tryStartServer();

@@ -19,8 +19,8 @@ public abstract class ConfigFile {
 	public ConfigFile() {
 
 	}
-	
-	public void init(){
+
+	public void init() {
 		values.clear();
 		defaultValues.clear();
 
@@ -54,13 +54,13 @@ public abstract class ConfigFile {
 					return true;
 				return false;
 			case ":path:":
-				if(value.length() < 2)
+				if (value.length() < 2)
 					return false;
 				if (!value.startsWith("\"") || !value.endsWith("\""))
 					return false;
 				return true;
 			case ":string:":
-				if(value.length() < 2)
+				if (value.length() < 2)
 					return false;
 				if (!value.startsWith("\"") || !value.endsWith("\""))
 					return false;
@@ -84,7 +84,8 @@ public abstract class ConfigFile {
 
 		String res = values.get(configName);
 		if (res == null)
-			throw new ConfigNotFoundException("Key '" + configName + "' not found!");
+			throw new ConfigNotFoundException("Key '" + configName
+					+ "' not found!");
 
 		// Check if value is valid, otherwise replace with default value
 		if (!isValid(configName, res)) {
@@ -99,15 +100,15 @@ public abstract class ConfigFile {
 		return res;
 	}
 
-	public void setConfig(String configName, String value) throws ConfigNotFoundException {
+	public void setConfig(String configName, String value)
+			throws ConfigNotFoundException {
 		if (!values.containsKey(configName))
-			throw new ConfigNotFoundException("Key '" + configName + "' not found!");
+			throw new ConfigNotFoundException("Key '" + configName
+					+ "' not found!");
 		values.put(configName, value);
 		writeToFile();
 	}
 
-	
-	
 	private void readFromFile() {
 		Scanner scanner;
 
@@ -138,15 +139,16 @@ public abstract class ConfigFile {
 
 					if (!values.containsKey(key))
 						continue;
-					
-					// Check if value is valid, otherwise replace with default value
+
+					// Check if value is valid, otherwise replace with default
+					// value
 					if (!isValid(key, value)) {
 						value = defaultValues.get(key);
 						if (value == null)
 							throw new CriticalException("Key '" + key
 									+ "' not found!");
 					}
-					
+
 					values.put(key, value);
 
 				} catch (Exception e) {
@@ -180,26 +182,28 @@ public abstract class ConfigFile {
 					configDescription = "";
 
 				String[] validValues = getValidValues(e.getKey());
-				
-				boolean printValidValues = true;
-				if(validValues.length == 1)
-					if(validValues[0].startsWith(":") && validValues[0].endsWith(":"))
-						printValidValues = false;
-				
-				if (validValues != null && printValidValues) {
-					/*if (!configDescription.equals(""))
-						configDescription += "\n";
-					configDescription += "  Valid values: ";
-					for (int i = 0; i < validValues.length; i++) {
-						if (i != 0)
-							configDescription += ", ";
-						configDescription += "'" + validValues[i] + "'";
-					}*/
-					if (!configDescription.equals(""))
-						configDescription += "\n";
-					configDescription += "  Valid values:\n";
-					for(String validValue : validValues){
-						configDescription += "     - " + validValue + "\n";
+
+				if (validValues != null) {
+					boolean printValidValues = true;
+					if (validValues.length == 1)
+						if (validValues[0].startsWith(":")
+								&& validValues[0].endsWith(":"))
+							printValidValues = false;
+
+					if (printValidValues) {
+						/*
+						 * if (!configDescription.equals("")) configDescription
+						 * += "\n"; configDescription += "  Valid values: "; for
+						 * (int i = 0; i < validValues.length; i++) { if (i !=
+						 * 0) configDescription += ", "; configDescription +=
+						 * "'" + validValues[i] + "'"; }
+						 */
+						if (!configDescription.equals(""))
+							configDescription += "\n";
+						configDescription += "  Valid values:\n";
+						for (String validValue : validValues) {
+							configDescription += "     - " + validValue + "\n";
+						}
 					}
 				}
 

@@ -36,6 +36,7 @@ public class ServerWrapper {
 	private ServerMonitor serverMonitor;
 
 	private Date lastStartTime = null;
+	private Date lastActivity = new Date();
 	
 	public ServerWrapper(MCDownloader mcDownloader, ServerMonitor serverMonitor) {
 		this.mcDownloader = mcDownloader;
@@ -83,9 +84,10 @@ public class ServerWrapper {
 			serverProcess = pb.start();
 			stdIn.setStream(serverProcess.getOutputStream());
 			stdOut.setStream(serverProcess.getInputStream());
-			
+
 			status.set(Status.starting);
 			lastStartTime = new Date();
+			lastActivity = new Date();
 			stillAlive.set(true);
 			saveOff.set(false);
 		} finally {
@@ -101,12 +103,24 @@ public class ServerWrapper {
 				stdIn.write("stop");
 				if (!status.waitForValue(Status.stopped, 10000)) {
 					stdIn.write("stop");
-					if (!status.waitForValue(Status.stopped, 20000)) {
+					while (status.get() != Status.stopped) {
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							Log.warn(e);
+						}
+						if (getServerInactiveTime() > 30000) {
+							break;
+						}
+					}
+					if (status.get() != Status.stopped) {
+						Log.out("Unable to stop server gracefully. Killing server process ...");
 						serverProcess.destroy();
 						if (!status.waitForValue(Status.stopped, 10000)) {
 							Log.err("Unable to stop server!");
 						}
 					}
+
 				}
 			}
 			serverProcess = null;
@@ -166,9 +180,19 @@ public class ServerWrapper {
 		stdIn.write("seed");
 		return stillAlive.waitForValue(true, 20000);
 	}
-	
-	public Date getLastStartTime(){
+
+	public Date getLastStartTime() {
 		return lastStartTime;
+	}
+
+	public long getServerInactiveTime() {
+		return new Date().getTime() - lastActivity.getTime();
+	}
+
+	public void setServerWasActive() {
+
+		lastActivity = new Date();
+		
 	}
 
 }

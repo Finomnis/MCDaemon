@@ -15,7 +15,7 @@ public class MainConfigFile extends ConfigFile {
 		configs.put("autoPatcherInterval", "30");
 		configs.put("serverMemory", "1024");
 		configs.put("seedCrashTestEnabled", "true");
-		configs.put("crashTestInterval", "60");
+		configs.put("crashTestInterval", "30");
 		configs.put("autoPatcherEnabled", "true");
 	}
 
