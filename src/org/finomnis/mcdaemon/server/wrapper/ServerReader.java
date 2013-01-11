@@ -104,23 +104,23 @@ public class ServerReader implements Runnable{
 	private void processMessage(String msg) {
 		serverWrapper.setServerWasActive();
 		Log.serverMessage(msg);
-		if(msg.matches(".*\\[INFO\\] Done \\(\\d*\\.\\d*s\\)\\! For help\\, type \\\"help\\\".*\\n?"))
+		if(msg.matches(".*\\[INFO\\].*Done \\(\\d*\\.\\d*s\\)\\! For help\\, type \\\"help\\\".*\\n?"))
 		{	// Server start
 			Log.out("Server running.");
 			serverWrapper.setStatus(Status.running);
 			saveOffCaught = false;
 		}
-		else if (msg.matches(".*\\[INFO\\] Seed: \\-?\\d*\\n?"))
+		else if (msg.matches(".*\\[INFO\\].*Seed: \\-?\\d*\\n?"))
 		{	// Seed message
 			Log.debug("StillAliveMessage caught.");
 			serverWrapper.setStillAlive(true);
 		}
-		else if (msg.matches(".*\\[INFO\\] Turned off world auto\\-saving.*\\n?"))
+		else if (msg.matches(".*\\[INFO\\].*Turned off world auto\\-saving.*\\n?"))
 		{	// save-off
 			Log.debug("Save-off caught.");
 			saveOffCaught = true;
 		}
-		else if (msg.matches(".*\\[INFO\\] Saved the world.*\\n?"))
+		else if (msg.matches(".*\\[INFO\\].*Saved the world.*\\n?"))
 		{	// save-all
 			Log.debug("Save-all caught.");
 			if(saveOffCaught)
@@ -129,7 +129,7 @@ public class ServerReader implements Runnable{
 				Log.debug("Server is now in backup mode.");
 			}
 		}
-		else if (msg.matches(".*\\[INFO\\] Turned on world auto\\-saving.*\\n?"))
+		else if (msg.matches(".*\\[INFO\\].*Turned on world auto\\-saving.*\\n?"))
 		{	// save-on
 			Log.debug("Save-on caught.");
 			serverWrapper.setSaveOff(false);

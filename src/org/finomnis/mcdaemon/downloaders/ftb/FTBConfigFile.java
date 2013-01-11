@@ -19,6 +19,7 @@ public class FTBConfigFile extends ConfigFile {
 	@Override
 	protected void setDefaultValues(Map<String, String> configs) {
 		configs.put("modpackName", "\"MindCrack Pack\"");
+		configs.put("autoSetMOTDEnabled", "true");
 	}
 
 	@Override
@@ -32,6 +33,8 @@ public class FTBConfigFile extends ConfigFile {
 		{
 		case "modpackName": 
 			return "Which modpack to download";
+		case "autoSetMOTDEnabled":
+			return "Sets MOTD to \"FTB: *serverpack* *version* (*mcVersion*)\"";
 		default:
 			return "No description available.";
 		}				
@@ -54,6 +57,8 @@ public class FTBConfigFile extends ConfigFile {
 				Log.warn(e);
 				return new String[]{":string:"};
 			}
+		case "autoSetMOTDEnabled":
+			return new String[]{":bool:"};
 		default:
 			return null;
 		}	
