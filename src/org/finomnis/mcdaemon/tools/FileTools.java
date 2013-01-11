@@ -26,10 +26,8 @@ public class FileTools {
 				if (!delete(subFile))
 					return false;
 			}
-			Log.err(file.getPath());
 			return file.delete();
 		} else {
-			Log.err(file.getPath());
 			return file.delete();
 		}
 	}
@@ -262,7 +260,7 @@ public class FileTools {
 
 			}
 
-			entry = zipStream.getNextEntry();
+		entry = zipStream.getNextEntry();
 		}
 
 		zipStream.closeEntry();

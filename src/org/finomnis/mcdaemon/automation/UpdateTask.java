@@ -1,10 +1,12 @@
 package org.finomnis.mcdaemon.automation;
 
+import java.io.IOException;
 import java.util.Date;
 
 import org.finomnis.mcdaemon.MCDaemon;
 import org.finomnis.mcdaemon.downloaders.MCDownloader;
 import org.finomnis.mcdaemon.tools.ConfigNotFoundException;
+import org.finomnis.mcdaemon.tools.CriticalException;
 import org.finomnis.mcdaemon.tools.Log;
 
 public class UpdateTask implements Task {
@@ -39,7 +41,17 @@ public class UpdateTask implements Task {
 		Log.debug("Checking for update...");
 		if(mcDownloader.updateAvailable())
 		{
-			Log.out("!!!UPDATE!!!");
+			Log.out("Update available. Stopping server...");
+			MCDaemon.enterMaintenanceMode();
+			try {
+				Log.out("Updating...");
+				mcDownloader.update();
+				Log.out("Update successful. Starting server...");
+			} catch (IOException | CriticalException e) {
+				Log.err("Unable to update server.");
+				Log.err(e);
+			}
+			MCDaemon.exitMaintenanceMode();
 		}
 		else
 		{

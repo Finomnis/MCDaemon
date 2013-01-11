@@ -6,18 +6,23 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.finomnis.mcdaemon.MCDaemon;
 import org.finomnis.mcdaemon.downloaders.MCDownloader;
 import org.finomnis.mcdaemon.server.wrapper.ServerWrapper;
+import org.finomnis.mcdaemon.server.wrapper.ServerWrapper.Status;
 import org.finomnis.mcdaemon.tools.ConfigNotFoundException;
 import org.finomnis.mcdaemon.tools.Log;
+import org.finomnis.mcdaemon.tools.SyncVar;
 
 public class ServerMonitor implements Runnable {
 
 	private enum Task {
-		checkHealth, save_off, save_on, restart, stop
+		checkHealth, save_off, save_on, restart, shutdown
 	}
 
 	private BlockingQueue<Task> tasks;
 	private MCDownloader mcDownloader;
 	private ServerWrapper serverWrapper;
+
+	private volatile Status targetStatus = Status.running;
+	private volatile SyncVar<Status> acceptedStatus = new SyncVar<Status>(Status.running);
 
 	public ServerMonitor(MCDownloader mcDownloader) {
 		this.mcDownloader = mcDownloader;
@@ -38,57 +43,93 @@ public class ServerMonitor implements Runnable {
 			}
 
 			switch (task) {
-			case stop:
+			case shutdown:
 				Log.debug("serverMonitor caught stopmessage.");
 				serverWrapper.shutdown();
 				return;
 			case checkHealth:
 				Log.debug("Running health check...");
-				switch (serverWrapper.getStatus()) {
-				case stopped:
-					Log.out("Server seems to not run. Starting server ...");
-					tryStartServer();
-					break;
-				case starting:
-					if(serverWrapper.getServerInactiveTime() > 60000) {
-						Log.out("Server seems like it crashed during startup. Restarting server ...");
-						serverWrapper.stopServer();
-						tryStartServer();
-					} else {
-						Log.debug("Server seems to be starting without error.");
-					}
-					break;
-				case running:
-					boolean seedCheckEnabled = false;
-					try {
-						seedCheckEnabled = Boolean.parseBoolean(MCDaemon.getConfig("seedCrashTestEnabled"));
-					} catch (ConfigNotFoundException e) {
-						Log.warn(e);
-					}
-					if (seedCheckEnabled) {
-						if (!serverWrapper.stillAliveTest()) {
-							Log.out("Server seems like it crashed. Restarting server ...");
-							serverWrapper.stopServer();
-							tryStartServer();
-						} else {
-							Log.debug("Server seems running and healthy.");
-						}
-					} else {
-						Log.debug("Server seems running.");
-					}
-					break;
-				default:
-					break;
+				if (targetStatus == Status.running) {
+					ensureServerRunning();
+					acceptedStatus.set(Status.running);
+				} else {
+					ensureServerStopped();
+					acceptedStatus.set(Status.stopped);
 				}
 				continue;
 			case restart:
 				serverWrapper.stopServer();
-				tryStartServer();
+				if (targetStatus == Status.running)
+					tryStartServer();
 			default:
 				continue;
 			}
 
 		}
+	}
+
+	private void ensureServerStopped() {
+
+		if (serverWrapper.getStatus() != Status.stopped)
+			serverWrapper.stopServer();
+
+	}
+	
+	public void enterMaintenanceMode(){
+		
+		targetStatus = Status.stopped;
+		requestHealthCheck();
+		acceptedStatus.waitForValue(Status.stopped);
+		
+	}
+
+	public void exitMaintenanceMode(){
+		
+		targetStatus = Status.running;
+		requestHealthCheck();
+		
+	}
+	
+	private void ensureServerRunning() {
+
+		switch (serverWrapper.getStatus()) {
+		case stopped:
+			Log.out("Server seems to not run. Starting server ...");
+			tryStartServer();
+			break;
+		case starting:
+			if (serverWrapper.getServerInactiveTime() > 60000) {
+				Log.out("Server seems like it crashed during startup. Restarting server ...");
+				serverWrapper.stopServer();
+				tryStartServer();
+			} else {
+				Log.debug("Server seems to be starting without error.");
+			}
+			break;
+		case running:
+			boolean seedCheckEnabled = false;
+			try {
+				seedCheckEnabled = Boolean.parseBoolean(MCDaemon
+						.getConfig("seedCrashTestEnabled"));
+			} catch (ConfigNotFoundException e) {
+				Log.warn(e);
+			}
+			if (seedCheckEnabled) {
+				if (!serverWrapper.stillAliveTest()) {
+					Log.out("Server seems like it crashed. Restarting server ...");
+					serverWrapper.stopServer();
+					tryStartServer();
+				} else {
+					Log.debug("Server seems running and healthy.");
+				}
+			} else {
+				Log.debug("Server seems running.");
+			}
+			break;
+		default:
+			break;
+		}
+
 	}
 
 	private void tryStartServer() {
@@ -107,7 +148,7 @@ public class ServerMonitor implements Runnable {
 
 	public void initShutdown() {
 		tasks.clear();
-		tasks.add(Task.stop);
+		tasks.add(Task.shutdown);
 	}
 
 	public ServerWrapper getWrapper() {

@@ -187,4 +187,12 @@ public class MCDaemon {
 		serverMonitor.requestHealthCheck();
 	}
 
+	public static void enterMaintenanceMode(){
+		serverMonitor.enterMaintenanceMode();
+	}
+	
+	public static void exitMaintenanceMode(){
+		serverMonitor.exitMaintenanceMode();
+	}
+	
 }

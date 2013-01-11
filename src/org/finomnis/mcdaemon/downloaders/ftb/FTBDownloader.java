@@ -17,6 +17,7 @@ import org.xml.sax.SAXException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -263,12 +264,12 @@ public class FTBDownloader implements MCDownloader {
 			Log.out("Downloading \"" + getModpackNameFromConfig() + " v" + version + " (" + mcVersion + ")\" ...");
 			Log.debug("Downloading from \"" + downloadUrl + "\" ...");
 			
-			/*OutputStream fStream = FileTools.openFileWrite(serverZipName, false);
+			OutputStream fStream = FileTools.openFileWrite(serverZipName, false);
 			InputStream urlStream = DownloadTools.openUrl(downloadUrl);
 			FileTools.writeFromStream(urlStream, fStream);
 			fStream.close();
 			urlStream.close();			
-			*/
+			
 			Log.debug("Calculating MD5...");
 			String zipMd5 = FileTools.md5(new File(serverZipName));
 			Log.debug("Zip MD5: '" + zipMd5 + "'");
@@ -286,10 +287,9 @@ public class FTBDownloader implements MCDownloader {
 			if(FileTools.folderExists(folderName + "mods/"))
 				if(!FileTools.delete(folderName + "mods/"))
 					throw new CriticalException("Unable to delete mods folder!");
-			
+		
+			Log.out("Extracting server files...");
 			FileTools.unzip(serverZipName, folderName);
-			
-			
 			
 			ftbStatusFile.setConfig("activeMCVersion", mcVersion);
 			ftbStatusFile.setConfig("activeModVersion", version);
