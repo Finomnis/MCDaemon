@@ -31,7 +31,7 @@ public class MainConfigFile extends ConfigFile {
 		switch(config)
 		{
 		case "mcEdition": 
-			return "Which server to download.";
+			return "The desired server type.";
 		case "backupEnabled":
 			return "Enables/disables autobackup.";
 		case "backupInterval":
