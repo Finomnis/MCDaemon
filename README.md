@@ -5,6 +5,9 @@ A Java Daemon for automated Minecraft server maintenance
 
 _-- Beta 0.1 released --_
 
+For details, go to http://forum.feed-the-beast.com/threads/java-daemon-for-unix-windows.7363/
+
+
 Features:
 ---------
 
@@ -25,5 +28,5 @@ Supported Modes:
 ----------------
 
 - Directly run jar as process (Platformindependant)
-- [Upcoming] Run as Daemon via jsvc (Unix)
+- Run as Daemon via jsvc (Unix)
 - [Upcoming] Run as Service via procrun (Windows)
