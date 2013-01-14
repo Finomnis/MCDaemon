@@ -23,7 +23,7 @@ public class VanillaDownloader implements MCDownloader {
 	private String newJarName = serverJarName + ".new";
 	private final static String downloadUrl = "https://s3.amazonaws.com/MinecraftDownload/launcher/minecraft_server.jar";
 	
-	
+	private volatile boolean newJarDownloaded = false;
 	
 	@Override
 	public void initialize() throws IOException, CriticalException {
@@ -38,6 +38,10 @@ public class VanillaDownloader implements MCDownloader {
 
 	private void downloadNewJar() throws IOException, CriticalException
 	{
+		Log.out("Downloading server executable...");
+		
+		newJarDownloaded = false;
+		
 		InputStream downloadStream = DownloadTools.openUrl(downloadUrl);
 		OutputStream newJar = FileTools.openFileWrite(newJarName, false);
 		FileTools.writeFromStream(downloadStream, newJar);
@@ -46,12 +50,15 @@ public class VanillaDownloader implements MCDownloader {
 		
 		if(10 > FileTools.fileSize(newJarName))
 			throw new CriticalException("Unable to download server executable!");
-				
+		
+		newJarDownloaded = true;
 	}
 	
 	@Override
 	public boolean updateAvailable(){
 
+		newJarDownloaded = false;
+		
 		if(!FileTools.fileExists(serverJarName))
 			return true;
 			
@@ -78,10 +85,12 @@ public class VanillaDownloader implements MCDownloader {
 	@Override
 	public void update() throws IOException, CriticalException {
 		
-		Log.out("Downloading server executable...");
 		
-		downloadNewJar();
+		if(!newJarDownloaded)
+			downloadNewJar();
 		
+		Log.out("Patching server executable...");
+			
 		FileTools.copyFile(newJarName, serverJarName);
 		
 	}
