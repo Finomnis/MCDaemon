@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="ext/commons-daemon-1.0.11.jar" sourcepath="ext/commons-daemon-1.0.11-sources.jar"/>
 	<classpathentry kind="lib" path="ext/FastMD5.jar"/>
+	<classpathentry kind="lib" path="ext/jsoup-1.7.1.jar" sourcepath="ext/jsoup-1.7.1-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

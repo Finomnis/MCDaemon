@@ -1,23 +1,22 @@
-package org.finomnis.mcdaemon.downloaders.ftb;
+package org.finomnis.mcdaemon.downloaders.bukkit;
 
 import java.util.Map;
 
 import org.finomnis.mcdaemon.tools.ConfigFile;
 
-public class FTBStatusFile extends ConfigFile {
+public class BukkitStatusFile extends ConfigFile {
 
-	FTBDownloader downloader;
+	BukkitDownloader downloader;
 	
-	public FTBStatusFile(FTBDownloader downloader){
+	public BukkitStatusFile(BukkitDownloader downloader)
+	{
 		this.downloader = downloader;
 	}
 	
 	@Override
 	protected void setDefaultValues(Map<String, String> configs) {
 		configs.clear();
-		configs.put("activeModpack", "null");
-		configs.put("activeModVersion", "-1");
-		configs.put("activeMCVersion", "null");
+		configs.put("newestServerBuild", "-1");
 	}
 
 	@Override
