@@ -15,8 +15,7 @@ import org.finomnis.mcdaemon.tools.SyncVar;
 public class ServerMonitor implements Runnable {
 
 	private static long startupTimeout = 120;
-	
-	
+
 	private enum Task {
 		checkHealth, save_off, save_on, restart, shutdown
 	}
@@ -26,11 +25,13 @@ public class ServerMonitor implements Runnable {
 	private ServerWrapper serverWrapper;
 
 	private volatile Status targetStatus = Status.running;
-	private volatile SyncVar<Status> acceptedStatus = new SyncVar<Status>(Status.running);
+	private volatile SyncVar<Status> acceptedStatus = new SyncVar<Status>(
+			Status.running);
 
 	public ServerMonitor(MCDownloader mcDownloader) {
 		try {
-			startupTimeout = Integer.parseInt(MCDaemon.getConfig("crashTestStartupTimeout"));
+			startupTimeout = Integer.parseInt(MCDaemon
+					.getConfig("crashTestStartupTimeout"));
 		} catch (NumberFormatException | ConfigNotFoundException e) {
 			Log.warn(e);
 		}
@@ -83,31 +84,32 @@ public class ServerMonitor implements Runnable {
 			serverWrapper.stopServer();
 
 	}
-	
-	public void enterMaintenanceMode(){
-		
+
+	public void enterMaintenanceMode() {
+
 		targetStatus = Status.stopped;
 		requestHealthCheck();
 		acceptedStatus.waitForValue(Status.stopped);
-		
+
 	}
 
-	public void exitMaintenanceMode(){
-		
+	public void exitMaintenanceMode() {
+
 		targetStatus = Status.running;
 		requestHealthCheck();
-		
+
 	}
-	
+
 	private void ensureServerRunning() {
 
 		switch (serverWrapper.getStatus()) {
 		case stopped:
-			Log.out("Server seems to not run. Starting server ...");
+			Log.out("Server seems to not run.");
 			tryStartServer();
 			break;
 		case starting:
-			if (serverWrapper.getServerInactiveTime() > startupTimeout * 1000) {
+			if (serverWrapper.getServerInactiveTime() > startupTimeout * 1000
+					|| mcDownloader.runEditionSpecificCrashTest()) {
 				Log.out("Server seems like it crashed during startup. Restarting server ...");
 				serverWrapper.stopServer();
 				tryStartServer();
@@ -117,23 +119,36 @@ public class ServerMonitor implements Runnable {
 			break;
 		case running:
 			boolean seedCheckEnabled = false;
-			try {
-				seedCheckEnabled = Boolean.parseBoolean(MCDaemon
-						.getConfig("seedCrashTestEnabled"));
-			} catch (ConfigNotFoundException e) {
-				Log.warn(e);
-			}
-			if (seedCheckEnabled) {
-				if (!serverWrapper.stillAliveTest()) {
-					Log.out("Server seems like it crashed. Restarting server ...");
-					serverWrapper.stopServer();
-					tryStartServer();
-				} else {
-					Log.debug("Server seems running and healthy.");
-				}
+			boolean serverCrashed = false;
+			
+			if (mcDownloader.runEditionSpecificCrashTest()) {
+				serverCrashed = true;
 			} else {
-				Log.debug("Server seems running.");
+
+				try {
+					seedCheckEnabled = Boolean.parseBoolean(MCDaemon
+							.getConfig("seedCrashTestEnabled"));
+				} catch (ConfigNotFoundException e) {
+					Log.warn(e);
+				}
+				if (seedCheckEnabled) {
+					if (!serverWrapper.stillAliveTest()) {
+						serverCrashed = true;
+					}
+				}
 			}
+
+			if(serverCrashed)
+			{
+				Log.out("Server seems like it crashed. Restarting server ...");
+				serverWrapper.stopServer();
+				tryStartServer();
+			}
+			else
+			{
+				Log.debug("Server seems running and healthy.");
+			}
+			
 			break;
 		default:
 			break;
@@ -163,26 +178,30 @@ public class ServerMonitor implements Runnable {
 	public ServerWrapper getWrapper() {
 		return serverWrapper;
 	}
-	
-	public boolean setSaveOff(){
+
+	public boolean setSaveOff() {
 		return serverWrapper.setSaveOff();
 	}
-	
-	public void setSaveOn(){
+
+	public void setSaveOn() {
 		// Additional Healthcheck
 		Date startDate = new Date();
 		Status serverStatus = serverWrapper.getStatus();
-		// Save-off check at save-on function to prevent restarting of server while backing up
-		if(serverWrapper.getSaveOff() == false && serverStatus == Status.running && serverWrapper.getLastStatusChangeDate().getTime() < startDate.getTime() - 10000)
-		{
+		// Save-off check at save-on function to prevent restarting of server
+		// while backing up
+		if (serverWrapper.getSaveOff() == false
+				&& serverStatus == Status.running
+				&& serverWrapper.getLastStatusChangeDate().getTime() < startDate
+						.getTime() - 10000) {
 			Log.out("Unable to set server to save-off mode. Server seems to have crashed. Restarting server ...");
 			tasks.add(Task.restart);
 			return;
 		}
-		if(serverWrapper.setSaveOn())
+		if (serverWrapper.setSaveOn())
 			return;
-		if(serverStatus == Status.running && serverWrapper.getLastStatusChangeDate().getTime() < startDate.getTime() - 1000)
-		{
+		if (serverStatus == Status.running
+				&& serverWrapper.getLastStatusChangeDate().getTime() < startDate
+						.getTime() - 1000) {
 			Log.out("Unable to set server to save-on mode. Server seems to have crashed. Restarting server ...");
 			tasks.add(Task.restart);
 		}

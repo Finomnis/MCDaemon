@@ -132,4 +132,9 @@ public class VanillaDownloader implements MCDownloader {
 		return arguments;
 	}
 
+	@Override
+	public boolean runEditionSpecificCrashTest() {
+		return false;
+	}
+
 }

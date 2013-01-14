@@ -13,5 +13,6 @@ public interface MCDownloader {
 	public boolean updateAvailable();
 	public void update() throws IOException, CriticalException;
 	public List<String> getInvocationCommand();
+	public boolean runEditionSpecificCrashTest();
 	
 }

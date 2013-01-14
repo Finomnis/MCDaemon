@@ -4,6 +4,7 @@ import org.finomnis.mcdaemon.MCDaemon;
 import org.finomnis.mcdaemon.downloaders.MCDownloader;
 import org.finomnis.mcdaemon.tools.ConfigFile;
 import org.finomnis.mcdaemon.tools.ConfigNotFoundException;
+import org.finomnis.mcdaemon.tools.CrashReportTools;
 import org.finomnis.mcdaemon.tools.CriticalException;
 import org.finomnis.mcdaemon.tools.DownloadTools;
 import org.finomnis.mcdaemon.tools.FileTools;
@@ -41,7 +42,7 @@ public class FTBDownloader implements MCDownloader {
 
 	private ConfigFile ftbConfig;
 	private FTBStatusFile ftbStatusFile;
-	
+
 	private boolean updatePrepared = false;
 
 	private String update_dirName;
@@ -49,11 +50,9 @@ public class FTBDownloader implements MCDownloader {
 	private String update_serverPack;
 	private String update_mcVersion;
 	private String update_modPackName;
-	
-	
+
 	private DocumentBuilder xmlDocumentBuilder = null;
 
-	
 	private NodeList getModPackList() throws SAXException, IOException,
 			CriticalException {
 		InputStream is = DownloadTools.openUrl(packListUrl);
@@ -62,9 +61,10 @@ public class FTBDownloader implements MCDownloader {
 		return modpackList.getElementsByTagName("modpack");
 	}
 
-	private void prepareUpdate() throws IOException, CriticalException, ParserConfigurationException, SAXException{
+	private void prepareUpdate() throws IOException, CriticalException,
+			ParserConfigurationException, SAXException {
 		updatePrepared = false;
-		
+
 		update_modPackName = getModpackNameFromConfig();
 
 		String[] properties = getModPackInfos(update_modPackName);
@@ -74,14 +74,14 @@ public class FTBDownloader implements MCDownloader {
 		update_serverPack = properties[2];
 		update_mcVersion = properties[3];
 
-		String downloadUrl = getModpackUrl(update_dirName, update_version, update_serverPack);
+		String downloadUrl = getModpackUrl(update_dirName, update_version,
+				update_serverPack);
 
-		Log.out("Downloading \"" + update_modPackName + " v" + update_version + " ("
-				+ update_mcVersion + ")\" ...");
+		Log.out("Downloading \"" + update_modPackName + " v" + update_version
+				+ " (" + update_mcVersion + ")\" ...");
 		Log.debug("Downloading from \"" + downloadUrl + "\" ...");
 
-		OutputStream fStream = FileTools
-				.openFileWrite(serverZipName, false);
+		OutputStream fStream = FileTools.openFileWrite(serverZipName, false);
 		InputStream urlStream = DownloadTools.openUrl(downloadUrl);
 		FileTools.writeFromStream(urlStream, fStream);
 		fStream.close();
@@ -91,7 +91,8 @@ public class FTBDownloader implements MCDownloader {
 		String zipMd5 = FileTools.md5(new File(serverZipName));
 		Log.debug("Zip MD5: '" + zipMd5 + "'");
 		Log.debug("Downloading validation MD5 ...");
-		String validationMd5 = getModpackMD5(update_dirName, update_version, update_serverPack);
+		String validationMd5 = getModpackMD5(update_dirName, update_version,
+				update_serverPack);
 		Log.debug("Val MD5: '" + validationMd5 + "'");
 
 		if (!zipMd5.equals(validationMd5)) {
@@ -99,10 +100,9 @@ public class FTBDownloader implements MCDownloader {
 					"Error downloading Modpack! (MD5 Checksum doesn't fit!");
 		}
 
-		
 		updatePrepared = true;
 	}
-	
+
 	public List<String> getModPackNames() throws SAXException, IOException,
 			CriticalException {
 
@@ -167,6 +167,8 @@ public class FTBDownloader implements MCDownloader {
 
 		if (!FileTools.folderExists(folderName))
 			FileTools.createFolder(folderName);
+
+		CrashReportTools.removeCrashReports(folderName);
 
 		if (!FileTools.fileExists(serverJarName))
 			update();
@@ -264,7 +266,7 @@ public class FTBDownloader implements MCDownloader {
 
 	}
 
-	private boolean checkUpdateAvailable(){
+	private boolean checkUpdateAvailable() {
 		if (!FileTools.fileExists(serverJarName))
 			return true;
 
@@ -283,24 +285,24 @@ public class FTBDownloader implements MCDownloader {
 		} catch (Exception e) {
 			Log.err(e);
 			return false;
-		}		
+		}
 	}
-	
+
 	@Override
 	public boolean updateAvailable() {
 
-		if(!checkUpdateAvailable())
+		if (!checkUpdateAvailable())
 			return false;
-		
+
 		updatePrepared = false;
-		
-		try{
+
+		try {
 			prepareUpdate();
 		} catch (Exception e) {
 			Log.err(e);
 			return false;
 		}
-		
+
 		return true;
 
 	}
@@ -332,20 +334,18 @@ public class FTBDownloader implements MCDownloader {
 	@Override
 	public void update() throws IOException, CriticalException {
 
-		
-		
 		try {
 
-			if(!updatePrepared)
+			if (!updatePrepared)
 				prepareUpdate();
 			updatePrepared = false;
-			
+
 			Log.debug("Delete coremods folder...");
 			if (FileTools.folderExists(folderName + "coremods/"))
 				if (!FileTools.delete(folderName + "coremods/"))
 					throw new CriticalException(
 							"Unable to delete coremods folder!");
-		
+
 			Log.debug("Delete mods folder...");
 			if (FileTools.folderExists(folderName + "mods/"))
 				if (!FileTools.delete(folderName + "mods/"))
@@ -456,6 +456,16 @@ public class FTBDownloader implements MCDownloader {
 			Log.err(e);
 		}
 
+	}
+
+
+
+	@Override
+	public boolean runEditionSpecificCrashTest() {
+		boolean res = CrashReportTools.crashReportExists(folderName);
+		if(res)
+			CrashReportTools.removeCrashReports(folderName);
+		return res;
 	}
 
 }

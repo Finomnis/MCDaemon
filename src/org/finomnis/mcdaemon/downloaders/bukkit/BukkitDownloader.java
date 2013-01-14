@@ -4,6 +4,7 @@ import org.finomnis.mcdaemon.MCDaemon;
 import org.finomnis.mcdaemon.downloaders.MCDownloader;
 import org.finomnis.mcdaemon.downloaders.bukkit.BukkitDownloadTools.BukkitEdition;
 import org.finomnis.mcdaemon.tools.ConfigNotFoundException;
+import org.finomnis.mcdaemon.tools.CrashReportTools;
 import org.finomnis.mcdaemon.tools.CriticalException;
 import org.finomnis.mcdaemon.tools.DownloadTools;
 import org.finomnis.mcdaemon.tools.FileTools;
@@ -49,6 +50,8 @@ public class BukkitDownloader implements MCDownloader {
 		if (!FileTools.folderExists(folderName))
 			FileTools.createFolder(folderName);
 
+		CrashReportTools.removeCrashReports(folderName);
+		
 		if (!FileTools.fileExists(serverJarName))
 			update();
 
@@ -226,5 +229,14 @@ public class BukkitDownloader implements MCDownloader {
 		arguments.add("--nojline");
 
 		return arguments;
+	}
+
+
+	@Override
+	public boolean runEditionSpecificCrashTest() {
+		boolean res = CrashReportTools.crashReportExists(folderName);
+		if(res)
+			CrashReportTools.removeCrashReports(folderName);
+		return res;
 	}
 }
