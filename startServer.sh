@@ -13,6 +13,12 @@ JAVA_HOME="$( readlink -f "$( which java )" | sed "s:bin/.*$::" )"
 
 do_exec()
 {
+	if [ "$1" == "-stop" ]; then
+		echo "Stopping server..."
+	else
+		echo "Starting server..."
+	fi
+
 	jsvc -home "$JAVA_HOME" -cp $CLASS_PATH -user $USER -outfile $LOG -errfile $LOG -pidfile $PIDFILE $1 $CLASS
 }
 
