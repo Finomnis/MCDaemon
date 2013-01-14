@@ -49,8 +49,8 @@ public class Log {
 	private static String format(String msg) {
 
 		SimpleDateFormat ft = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss.SSS");
-		String erg = ft.format(new Date()) + " ["
-				+ Thread.currentThread().getId() + "]  " + msg;
+		String erg = ft.format(new Date()) + (verbose?(" ["
+				+ Thread.currentThread().getId() + "]  "):"  ") + msg;
 		return erg;
 
 	}
