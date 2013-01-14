@@ -2,6 +2,8 @@
 
 SCRIPTBASEPATH=`readlink -f $0`
 BASEDIR=`dirname $SCRIPTBASEPATH`
+SCRIPTNAME=`basename $0`
+
 
 CLASS_PATH="/usr/share/java/commons-daemon.jar":$BASEDIR'/MCDaemon.jar'
 CLASS=org.finomnis.mcdaemon.Main
@@ -53,7 +55,10 @@ case $1 in
 		fi
 		;;
 	*)
-		echo "Usage: ./startServer.sh [start|stop|restart|status]"
+		echo "Usage:"
+		echo
+		echo "      ./${SCRIPTNAME} [start|stop|restart|status]"
+		echo
 		exit 3
 		;;
 esac
