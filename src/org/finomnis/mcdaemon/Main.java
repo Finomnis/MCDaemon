@@ -54,7 +54,9 @@ public class Main implements org.apache.commons.daemon.Daemon{
 	// To run it with jsvc
     @Override
     public void init(DaemonContext dc) throws Exception {
+    	Log.out("==================================");
     }
+    
     @Override
     public void start() {
     	try
