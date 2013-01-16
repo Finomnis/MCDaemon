@@ -48,8 +48,6 @@ case $1 in
 	status)
 		if [ -f $PIDFILE ]; then
 			PID=`cat $PIDFILE`
-			echo "MCDaemon is running. (PID: $PID)" 
-			PID=`cat $PIDFILE`
 			kill -0 $PID 2>/dev/null
 			PIDEXISTS=$?
 			if [ $PIDEXISTS -eq 0 ]; then
