@@ -49,7 +49,17 @@ case $1 in
 		if [ -f $PIDFILE ]; then
 			PID=`cat $PIDFILE`
 			echo "MCDaemon is running. (PID: $PID)" 
-		else
+			PID=`cat $PIDFILE`
+			kill -0 $PID 2>/dev/null
+			PIDEXISTS=$?
+			if [ $PIDEXISTS -eq 0 ]; then
+				echo "MCDaemon is running. (PID: $PID)"
+			else
+				echo "MCDaemon is not running."
+				echo "PID-File exists (PID: $PID). Something must have gone wrong."
+				exit 2
+			fi
+ 		else
 			echo "MCDaemon is not running."
 			exit 1
 		fi
