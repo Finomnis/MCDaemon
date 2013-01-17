@@ -212,6 +212,12 @@ public class ServerWrapper {
 		return status.getLastChangeDate();
 	}
 	
+	public void say(String msg)
+	{
+		Log.debug("Saying \"" + msg + "\"");
+		stdIn.write("say " + msg);
+	}
+	
 	public boolean setSaveOff(){
 		stdIn.write("save-off");
 		stdIn.write("save-all");

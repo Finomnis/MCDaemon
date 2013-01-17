@@ -221,4 +221,8 @@ public class MCDaemon {
 			backupLock.unlock();
 		}
 	}
+
+	public static void say(String msg) {
+		serverMonitor.say(msg);
+	}
 }

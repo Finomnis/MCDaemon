@@ -100,6 +100,10 @@ public class ServerMonitor implements Runnable {
 
 	}
 
+	public void say(String msg){
+		serverWrapper.say(msg);
+	}
+	
 	private void ensureServerRunning() {
 
 		switch (serverWrapper.getStatus()) {

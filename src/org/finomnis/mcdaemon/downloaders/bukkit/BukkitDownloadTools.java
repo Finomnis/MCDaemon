@@ -78,6 +78,7 @@ public class BukkitDownloadTools {
 		
 		String md5Checksum = null;
 		String buildNumber = null;
+		String buildString = null;
 		
 		for(int i = 0; i < downloadInformation.children().size(); i++)
 		{
@@ -92,7 +93,7 @@ public class BukkitDownloadTools {
 			}
 			if(child.text().contains("Version:"))
 			{
-				String buildString = downloadInformation.child(i+1).text().trim();
+				buildString = downloadInformation.child(i+1).text().trim();
 				int leftPos = buildString.indexOf("(Build #") + "(Build #".length();
 				int rightPos = buildString.lastIndexOf(")");
 				buildNumber = buildString.substring(leftPos, rightPos);
@@ -108,11 +109,12 @@ public class BukkitDownloadTools {
 		//Log.out(md5Checksum);
 		//Log.out(buildNumber);
 		
-		String[] ret = new String[3];
+		String[] ret = new String[4];
 		
 		ret[0] = downloadUrl;
 		ret[1] = md5Checksum;
 		ret[2] = buildNumber;
+		ret[3] = buildString;
 		
 		return ret;
 		

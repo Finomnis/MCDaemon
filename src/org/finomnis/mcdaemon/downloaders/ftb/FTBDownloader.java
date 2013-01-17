@@ -468,4 +468,12 @@ public class FTBDownloader implements MCDownloader {
 		return res;
 	}
 
+	@Override
+	public String getNewVersionName() {
+		if(!updatePrepared)
+			return null;
+		return update_modPackName + " v" + update_version + " ("
+				+ update_mcVersion + ")";
+	}
+
 }

@@ -137,4 +137,9 @@ public class VanillaDownloader implements MCDownloader {
 		return false;
 	}
 
+	@Override
+	public String getNewVersionName() {
+		return null;
+	}
+
 }

@@ -187,7 +187,7 @@ public class BukkitDownloader implements MCDownloader {
 		FileTools.copyFile(newJarName, serverJarName);
 		
 		try {
-			statusFile.setConfig("newestServerBuild", newestInfos[2]);
+			if(newestVersionInfoFetched) statusFile.setConfig("newestServerBuild", newestInfos[2]);
 		} catch (ConfigNotFoundException e) {
 			Log.err(e);
 		}
@@ -238,5 +238,13 @@ public class BukkitDownloader implements MCDownloader {
 		if(res)
 			CrashReportTools.removeCrashReports(folderName);
 		return res;
+	}
+
+	@Override
+	public String getNewVersionName() {
+		if(!newestVersionInfoFetched)
+			return null;
+		
+		return newestInfos[3];
 	}
 }

@@ -42,6 +42,16 @@ public class UpdateTask implements Task {
 		if(mcDownloader.updateAvailable())
 		{
 			Log.out("Update available. Stopping server...");
+			MCDaemon.say("Update available.");
+			String newVersionName = mcDownloader.getNewVersionName();
+			if(newVersionName != null)
+				MCDaemon.say("New version: \"" + newVersionName + "\"");
+			MCDaemon.say("Restarting server in 10 seconds ...");
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e1) {
+				Log.warn(e1);
+			}
 			MCDaemon.enterMaintenanceMode();
 			try {
 				Log.out("Updating...");
