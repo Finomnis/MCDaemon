@@ -5,7 +5,7 @@ A Java Daemon for automated Minecraft server maintenance
 
 _-- Beta 0.1 released --_
 
-For details, go to http://forum.feed-the-beast.com/threads/java-daemon-for-unix-windows.7363/
+For details, go to http://www.minecraftforum.net/topic/1645748-mcdaemon-a-java-daemon-for-unixwindows/
 
 
 Features:
