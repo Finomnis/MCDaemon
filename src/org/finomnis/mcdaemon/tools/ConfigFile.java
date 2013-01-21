@@ -80,6 +80,23 @@ public abstract class ConfigFile {
 
 	}
 
+	private String getType(String configName){
+		
+		String validValues[] = getValidValues(configName);
+
+		if (validValues == null)
+			return null;
+		
+		if (validValues.length != 1)
+			return null;
+		
+		if (validValues[0].startsWith(":") && validValues[0].endsWith(":"))
+			return validValues[0];
+
+		return null;
+		
+	}
+	
 	public String getConfig(String configName) throws ConfigNotFoundException {
 
 		String res = values.get(configName);
@@ -96,7 +113,19 @@ public abstract class ConfigFile {
 			values.put(configName, res);
 			writeToFile();
 		}
-
+		
+		// alter value if necessary
+		String configType = getType(configName);
+		
+		if(configType != null)
+		{
+			switch(configType)
+			{
+				case ":path:":
+					res = res.substring(1, res.length()-1);
+			}
+		}
+		
 		return res;
 	}
 
@@ -105,6 +134,20 @@ public abstract class ConfigFile {
 		if (!values.containsKey(configName))
 			throw new ConfigNotFoundException("Key '" + configName
 					+ "' not found!");
+		
+		// alter value if necessary
+		String configType = getType(configName);
+		
+		if(configType != null)
+		{
+			switch(configType)
+			{
+				case ":path:":
+					value = "\"" + value + "\"";
+			}
+		}
+		
+		
 		values.put(configName, value);
 		writeToFile();
 	}
