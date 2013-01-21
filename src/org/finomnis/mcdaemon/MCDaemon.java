@@ -1,5 +1,6 @@
 package org.finomnis.mcdaemon;
 
+import java.io.File;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -209,7 +210,8 @@ public class MCDaemon {
 			if(backupEnabled)
 			{
 				Log.out("Running backup...");
-				ProcessBuilder pb = new ProcessBuilder(configFile.getConfig("backupScript"));
+				File f = new File(configFile.getConfig("backupScript"));
+				ProcessBuilder pb = new ProcessBuilder(f.getCanonicalPath());
 				Process backupProcess = pb.start();
 				backupProcess.waitFor();	
 				Log.debug("Successfully backed up.");
