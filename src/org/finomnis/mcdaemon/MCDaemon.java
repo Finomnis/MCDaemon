@@ -212,6 +212,7 @@ public class MCDaemon {
 				Log.out("Running backup...");
 				File f = new File(configFile.getConfig("backupScript"));
 				ProcessBuilder pb = new ProcessBuilder(f.getCanonicalPath());
+				pb.directory(f.getCanonicalFile().getParentFile());
 				Process backupProcess = pb.start();
 				backupProcess.waitFor();	
 				Log.debug("Successfully backed up.");
