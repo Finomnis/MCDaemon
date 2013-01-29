@@ -50,7 +50,9 @@ public class FTBDownloader implements MCDownloader {
 	private String update_serverPack;
 	private String update_mcVersion;
 	private String update_modPackName;
-
+	private String update_repoVersion;
+	
+	
 	private DocumentBuilder xmlDocumentBuilder = null;
 
 	private NodeList getModPackList() throws SAXException, IOException,
@@ -73,8 +75,14 @@ public class FTBDownloader implements MCDownloader {
 		update_version = properties[1];
 		update_serverPack = properties[2];
 		update_mcVersion = properties[3];
-
-		String downloadUrl = getModpackUrl(update_dirName, update_version,
+		update_repoVersion = properties[4];
+		
+		if(update_repoVersion == null)
+			update_repoVersion = update_mcVersion;
+		else if (update_repoVersion.equals(""))
+			update_repoVersion = update_mcVersion;
+		
+		String downloadUrl = getModpackUrl(update_dirName, update_repoVersion,
 				update_serverPack);
 
 		Log.out("Downloading \"" + update_modPackName + " v" + update_version
@@ -251,12 +259,13 @@ public class FTBDownloader implements MCDownloader {
 			if (element.getAttribute("name").compareTo(modpackName) != 0)
 				continue;
 
-			String[] ret = new String[4];
+			String[] ret = new String[5];
 
 			ret[0] = element.getAttribute("dir");
 			ret[1] = element.getAttribute("version");
 			ret[2] = element.getAttribute("serverPack");
 			ret[3] = element.getAttribute("mcVersion");
+			ret[4] = element.getAttribute("repoVersion");
 
 			return ret;
 
