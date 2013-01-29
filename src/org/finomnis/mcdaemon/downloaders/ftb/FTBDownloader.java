@@ -99,13 +99,13 @@ public class FTBDownloader implements MCDownloader {
 		String zipMd5 = FileTools.md5(new File(serverZipName));
 		Log.debug("Zip MD5: '" + zipMd5 + "'");
 		Log.debug("Downloading validation MD5 ...");
-		String validationMd5 = getModpackMD5(update_dirName, update_version,
+		String validationMd5 = getModpackMD5(update_dirName, update_repoVersion,
 				update_serverPack);
 		Log.debug("Val MD5: '" + validationMd5 + "'");
 
 		if (!zipMd5.equals(validationMd5)) {
 			throw new CriticalException(
-					"Error downloading Modpack! (MD5 Checksum doesn't fit!");
+					"Error downloading Modpack! (MD5 Checksum doesn't fit!)");
 		}
 
 		updatePrepared = true;
