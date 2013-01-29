@@ -226,6 +226,9 @@ public class MCDaemon {
 	}
 
 	public static void say(String msg) {
-		serverMonitor.say(msg);
+		if(serverMonitor != null)
+			serverMonitor.say(msg);
 	}
+
+
 }

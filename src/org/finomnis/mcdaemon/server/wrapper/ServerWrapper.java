@@ -215,7 +215,10 @@ public class ServerWrapper {
 	public void say(String msg)
 	{
 		Log.debug("Saying \"" + msg + "\"");
-		stdIn.write("say " + msg);
+		if(stdIn != null)
+			stdIn.write("say " + msg);
+		else
+			Log.debug("Can't say. stdIn not initialized.");
 	}
 	
 	public boolean setSaveOff(){

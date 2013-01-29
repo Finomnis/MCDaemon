@@ -308,6 +308,8 @@ public class FTBDownloader implements MCDownloader {
 		try {
 			prepareUpdate();
 		} catch (Exception e) {
+			MCDaemon.say("Error while updating server.");
+			MCDaemon.say("Please contact administrator.");
 			Log.err(e);
 			return false;
 		}

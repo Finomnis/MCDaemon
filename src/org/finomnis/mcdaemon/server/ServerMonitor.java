@@ -101,7 +101,8 @@ public class ServerMonitor implements Runnable {
 	}
 
 	public void say(String msg){
-		serverWrapper.say(msg);
+		if(serverWrapper != null)
+			serverWrapper.say(msg);
 	}
 	
 	private void ensureServerRunning() {
