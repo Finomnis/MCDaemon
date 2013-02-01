@@ -3,7 +3,7 @@ MCDaemon
 
 A Java Daemon for automated Minecraft server maintenance
 
-_-- Beta 0.1 released --_
+_-- Beta 0.3 released --_
 
 For details, go to http://www.minecraftforum.net/topic/1645748-mcdaemon-a-java-daemon-for-unixwindows/
 
