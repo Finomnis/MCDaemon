@@ -217,7 +217,14 @@ public class FileTools {
 
 	}
 
-	public static void unzip(String zipName, String folderName)
+	public static void unzip(String zipName, String folderName) throws IOException
+	{
+		
+		unzip(zipName, folderName, false);
+		
+	}
+	
+	public static void unzip(String zipName, String folderName, boolean replaceJarNames)
 			throws IOException {
 
 		ZipInputStream zipStream = new ZipInputStream(openFileRead(zipName));
@@ -237,7 +244,7 @@ public class FileTools {
 
 			} else {
 
-				if (fileName.endsWith(".jar")
+				if (replaceJarNames && fileName.endsWith(".jar")
 						&& newFile.getParentFile().equals(parentFolder)) {
 					fileName = "server.jar";
 					newFile = new File(folderName + fileName);

@@ -13,6 +13,7 @@ import org.finomnis.mcdaemon.downloaders.MCDownloader;
 import org.finomnis.mcdaemon.downloaders.bukkit.BukkitDownloader;
 import org.finomnis.mcdaemon.downloaders.ftb.FTBDownloader;
 import org.finomnis.mcdaemon.downloaders.vanilla.VanillaDownloader;
+import org.finomnis.mcdaemon.downloaders.hexxit.HexxitDownloader;
 import org.finomnis.mcdaemon.server.ServerMonitor;
 import org.finomnis.mcdaemon.server.wrapper.ServerWrapper;
 import org.finomnis.mcdaemon.tools.ConfigNotFoundException;
@@ -111,6 +112,9 @@ public class MCDaemon {
 				break;
 			case "bukkit":
 				mcDownloader = new BukkitDownloader();
+				break;
+			case "hexxit":
+				mcDownloader = new HexxitDownloader();
 				break;
 			default:
 				throw new RuntimeException("Unable to determine downloader!");

@@ -10,3 +10,4 @@ bin/*
 
 # Config Files #
 *.cfg
+/bin

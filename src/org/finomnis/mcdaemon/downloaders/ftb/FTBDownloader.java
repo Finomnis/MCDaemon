@@ -363,7 +363,7 @@ public class FTBDownloader implements MCDownloader {
 					throw new CriticalException("Unable to delete mods folder!");
 
 			Log.out("Extracting server files...");
-			FileTools.unzip(serverZipName, folderName);
+			FileTools.unzip(serverZipName, folderName, true);
 
 			ftbStatusFile.setConfig("activeMCVersion", update_mcVersion);
 			ftbStatusFile.setConfig("activeModVersion", update_version);
