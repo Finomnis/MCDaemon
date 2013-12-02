@@ -33,8 +33,10 @@ public class MCDaemon {
 	private static Thread taskSchedulerThread = null;
 	private static Lock backupLock = new ReentrantLock();
 	
+	private static final String VERSION_NUMBER = "0.3.5.1";
+	
 	public static void start() {
-		Log.out("Starting Daemon ...");
+		Log.out("Starting Daemon (MCDaemon v" + VERSION_NUMBER + ") ...");
 
 		lock.lock();
 		if (running == true) {

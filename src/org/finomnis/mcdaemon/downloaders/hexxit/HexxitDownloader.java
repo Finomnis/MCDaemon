@@ -1,11 +1,14 @@
 package org.finomnis.mcdaemon.downloaders.hexxit;
 
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import org.finomnis.mcdaemon.MCDaemon;
 import org.finomnis.mcdaemon.downloaders.MCDownloader;
@@ -22,8 +25,11 @@ public class HexxitDownloader implements MCDownloader {
 	private String serverName = "Hexxit.jar";
 	private String serverJarName = folderName + serverName;
 	private String downloadName = folderName + "hexxit_update.zip";
+	private String serverPropertiesName = folderName + "server.properties";
+	private String serverPropertiesBackupName = serverPropertiesName + ".backup";
 	
 	private HexxitStatusFile statusFile; 
+	private HexxitConfigFile hexxitConfig;
 	
 	private volatile boolean newVersionDownloaded = false;
 	private volatile boolean newestVersionInfoFetched = false;
@@ -34,6 +40,8 @@ public class HexxitDownloader implements MCDownloader {
 	{
 		statusFile = new HexxitStatusFile(this);
 		statusFile.init();
+		hexxitConfig = new HexxitConfigFile();
+		hexxitConfig.init();
 	}
 	
 	@Override
@@ -65,7 +73,7 @@ public class HexxitDownloader implements MCDownloader {
 		infos = HexxitDownloadTools.fetchNewestVersionInfos();
 
 		if(infos == null)
-			throw new CriticalException("Unable to get download infos!");
+			throw new CriticalException("Unable to fetch version infos!");
 		
 		newestInfos = infos;
 		
@@ -95,7 +103,7 @@ public class HexxitDownloader implements MCDownloader {
 			return true;
 			
 		} catch (Exception e) {
-			Log.err(e);
+			Log.err("Unable to check for update! (" + e.getMessage() + ")");
 			return false;
 		}
 		
@@ -125,14 +133,81 @@ public class HexxitDownloader implements MCDownloader {
 	@Override
 	public void update() throws IOException, CriticalException {
 		
+		// backup server.properties
+		if(FileTools.fileExists(serverPropertiesName))
+		{
+			FileTools.copyFile(serverPropertiesName, serverPropertiesBackupName);
+		}
+		
 		if(!newVersionDownloaded)
 			downloadNewVersion();
 
 		FileTools.unzip(downloadName, folderName);
+
+		// revert to previous server.properties
+		if(FileTools.fileExists(serverPropertiesBackupName))
+		{
+			FileTools.copyFile(serverPropertiesBackupName, serverPropertiesName);
+		}
 		
 		try {
 			if(newestVersionInfoFetched) statusFile.setConfig("currentlyInstalledVersion", newestInfos[1]);
 		} catch (ConfigNotFoundException e) {
+			Log.err(e);
+		}
+		
+		setMOTD(newestInfos[1]);
+
+	}
+	
+	
+	private void setMOTD(String message) {
+
+		boolean autoSetMOTDEnabled = false;
+		try {
+			autoSetMOTDEnabled = Boolean.parseBoolean(hexxitConfig
+					.getConfig("autoSetMOTDEnabled"));
+		} catch (ConfigNotFoundException e1) {
+			Log.err(e1);
+		}
+		if (!autoSetMOTDEnabled)
+			return;
+				
+		Log.out("Setting MOTD to \"" + message + "\"");
+
+		List<String> serverProperties = new ArrayList<String>();
+
+		try {
+			Scanner scanner = new Scanner(new FileReader(folderName
+					+ "server.properties"));
+			try {
+				while (scanner.hasNextLine()) {
+					String nextLine = scanner.nextLine();
+					if (nextLine.matches(".*motd\\=.*\\n?"))
+						continue;
+					serverProperties.add(nextLine);
+				}
+			} finally {
+				scanner.close();
+			}
+		} catch (Exception e) {
+			Log.out("\"server.properties\" not found. Creating \"server.properties\"...");
+		}
+
+		serverProperties.add("motd=" + message);
+
+		try {
+			FileWriter fWriter = FileTools.openFileWriteText(folderName
+					+ "server.properties", false);
+			try {
+				for (String line : serverProperties) {
+					fWriter.write(line + "\r\n");
+				}
+			} finally {
+				fWriter.close();
+			}
+		} catch (IOException e) {
+			Log.err("Unable to set MOTD!");
 			Log.err(e);
 		}
 
@@ -146,6 +221,8 @@ public class HexxitDownloader implements MCDownloader {
 		String path = System.getProperty("java.home") + "/bin/java";
 		arguments.add(path);
 
+		arguments.add("-server");
+		
 		try {
 			String maxMemory = MCDaemon.getConfig("serverMemory");
 			arguments.add("-Xms" + maxMemory + "M");
@@ -161,6 +238,7 @@ public class HexxitDownloader implements MCDownloader {
 		arguments.add("-jar");
 		arguments.add(serverName);
 		arguments.add("--nojline");
+		arguments.add("nogui");
 
 		return arguments;
 	}
