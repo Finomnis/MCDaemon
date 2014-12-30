@@ -460,6 +460,19 @@ public class FTBDownloader implements MCDownloader {
 
 		serverProperties.add("motd=" + message);
 
+        try {
+            FileWriter fWriter = FileTools.openFileWriteText(folderName
+                    + "eula.txt", false);
+            try {
+                fWriter.write("eula=true\r\n");
+            } finally {
+                fWriter.close();
+            }
+        } catch (IOException e) {
+            Log.err("Unable to set eula=true in eula.txt!");
+            Log.err(e);
+        }
+
 		try {
 			FileWriter fWriter = FileTools.openFileWriteText(folderName
 					+ "server.properties", false);
