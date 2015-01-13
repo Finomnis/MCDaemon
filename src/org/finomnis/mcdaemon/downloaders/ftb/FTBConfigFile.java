@@ -18,7 +18,7 @@ public class FTBConfigFile extends ConfigFile {
 	
 	@Override
 	protected void setDefaultValues(Map<String, String> configs) {
-		configs.put("modpackName", "\"MindCrack Pack\"");
+		configs.put("modpackName", "\"Resurrection\"");
 		configs.put("autoSetMOTDEnabled", "true");
 	}
 

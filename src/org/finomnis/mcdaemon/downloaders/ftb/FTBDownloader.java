@@ -36,9 +36,9 @@ public class FTBDownloader implements MCDownloader {
 	private String serverJarName = folderName + serverName;
 	private String serverZipName = folderName + "download.zip";
 
-	private static final String downloadServerName = "http://www.creeperrepo.net";
+	private static final String downloadServerName = "http://new.creeperrepo.net";
 	private static final String packListUrl = downloadServerName
-			+ "/static/FTB2/modpacks.xml";
+			+ "/FTB2/static/modpacks.xml";
 
 	private ConfigFile ftbConfig;
 	private FTBStatusFile ftbStatusFile;
@@ -196,43 +196,10 @@ public class FTBDownloader implements MCDownloader {
 
 	}
 
-	public static String getDate() throws IOException, CriticalException {
-
-		InputStream httpStream = DownloadTools.openUrl(downloadServerName
-				+ "/getdate");
-
-		Scanner httpScanner = new Scanner(httpStream);
-
-		httpScanner.useDelimiter("\\Z");
-
-		if (!httpScanner.hasNext()) {
-			httpScanner.close();
-			throw new RuntimeException("Unable to read date!");
-		}
-
-		String date = httpScanner.next();
-
-		httpScanner.close();
-
-		return date;
-
-	}
-
-	private String getStaticUrlMD5() throws IOException, CriticalException {
-
-		String date = getDate();
-
-		String md5String = "mcepoch1" + date;
-
-		return FileTools.md5(md5String);
-
-	}
-
-	private String getModpackUrl(String dir, String version, String filename)
+	private static String getModpackUrl(String dir, String version, String filename)
 			throws IOException, CriticalException {
 
-		return downloadServerName + "/direct/FTB2/" + getStaticUrlMD5()
-				+ "/modpacks%5E" + dir + "%5E" + version + "%5E" + filename;
+		return downloadServerName + "/FTB2/modpacks%5E" + dir + "%5E" + version + "%5E" + filename;
 
 	}
 
@@ -240,8 +207,7 @@ public class FTBDownloader implements MCDownloader {
 			throws ParserConfigurationException, SAXException, IOException,
 			CriticalException {
 
-		InputStream is = DownloadTools.openUrl(downloadServerName
-				+ "/static/FTB2/modpacks.xml");
+		InputStream is = DownloadTools.openUrl(packListUrl);
 		Document modpackList = xmlDocumentBuilder.parse(is);
 		is.close();
 
@@ -322,23 +288,9 @@ public class FTBDownloader implements MCDownloader {
 			String filename) throws MalformedURLException, IOException,
 			CriticalException {
 
-		String md5Url = downloadServerName + "/md5/FTB2/" + "modpacks%5E" + dir
-				+ "%5E" + version + "%5E" + filename;
+		String modpackUrl = getModpackUrl(dir, version, filename);
 
-		Scanner scanner = new Scanner(DownloadTools.openUrl(md5Url));
-
-		scanner.useDelimiter("\\Z");
-
-		if (!scanner.hasNext()) {
-			scanner.close();
-			throw new RuntimeException("Unable to read md5!");
-		}
-
-		String md5 = scanner.next();
-
-		scanner.close();
-
-		return md5;
+		return DownloadTools.getContentMD5(modpackUrl);
 
 	}
 
