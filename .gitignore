@@ -11,3 +11,9 @@ bin/*
 # Config Files #
 *.cfg
 /bin
+
+# For Intellij Idea
+*.iml
+out/*
+.idea/*
+target/*
