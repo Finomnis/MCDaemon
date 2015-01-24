@@ -128,7 +128,7 @@ public class VanillaDownloader implements MCDownloader {
 
 		arguments.add("-jar");
 		arguments.add(serverName);
-		
+		arguments.add("nogui");		
 		
 		return arguments;
 	}

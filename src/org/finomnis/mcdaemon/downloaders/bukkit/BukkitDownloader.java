@@ -228,6 +228,7 @@ public class BukkitDownloader implements MCDownloader {
 		arguments.add("-jar");
 		arguments.add(serverName);
 		arguments.add("--nojline");
+		arguments.add("nogui");
 
 		return arguments;
 	}
