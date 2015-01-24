@@ -90,8 +90,9 @@ public class FTBDownloader implements MCDownloader {
 		Log.debug("Downloading from \"" + downloadUrl + "\" ...");
 
 		OutputStream fStream = FileTools.openFileWrite(serverZipName, false);
+		long downloadSize = DownloadTools.getContentLength(downloadUrl);
 		InputStream urlStream = DownloadTools.openUrl(downloadUrl);
-		FileTools.writeFromStream(urlStream, fStream);
+		FileTools.writeFromStream(urlStream, fStream, downloadSize);
 		fStream.close();
 		urlStream.close();
 
@@ -325,6 +326,19 @@ public class FTBDownloader implements MCDownloader {
 		
 	}
 	
+	private void agreeToEula(){
+		
+		if(FileTools.fileExists(folderName + "eula.txt")){
+			try {
+				Log.debug("Agreeing to eula...");
+				FileTools.replaceInFile(folderName + "eula.txt", "eula=false", "eula=true");
+			} catch (IOException e) {
+				Log.err(e);
+			}
+		}
+		
+	}
+	
 	@Override
 	public void update() throws IOException, CriticalException {
 
@@ -347,7 +361,7 @@ public class FTBDownloader implements MCDownloader {
 
 			Log.out("Extracting server files...");
 			FileTools.unzip(serverZipName, folderName, true);
-
+			
 			ftbStatusFile.setConfig("activeMCVersion", update_mcVersion);
 			ftbStatusFile.setConfig("activeModVersion", update_version);
 			ftbStatusFile.setConfig("activeModpack", update_modPackName);
@@ -468,6 +482,11 @@ public class FTBDownloader implements MCDownloader {
 			return null;
 		return update_modPackName + " v" + update_version + " ("
 				+ update_mcVersion + ")";
+	}
+
+	@Override
+	public void prepareStart() {
+		agreeToEula();
 	}
 
 }

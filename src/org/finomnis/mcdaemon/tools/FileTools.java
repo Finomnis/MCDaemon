@@ -47,7 +47,7 @@ public class FileTools {
 		return openFileWriteText(f, append);
 	}
 
-	public static OutputStream openFileWrite(File f, boolean append)
+	public static FileOutputStream openFileWrite(File f, boolean append)
 			throws FileNotFoundException {
 		File dir = f.getParentFile();
 		if (dir != null) {
@@ -56,7 +56,7 @@ public class FileTools {
 		return new FileOutputStream(f, append);
 	}
 
-	public static OutputStream openFileWrite(String path, boolean append)
+	public static FileOutputStream openFileWrite(String path, boolean append)
 			throws FileNotFoundException {
 		File f = new File(path);
 		return openFileWrite(f, append);
@@ -77,6 +77,31 @@ public class FileTools {
 		}
 
 	}
+		
+	private final static int logIntervalPercent = 1;
+	
+	public static void writeFromStream(InputStream iStream, OutputStream fWriter, long dataSize)
+			throws IOException {
+		
+		byte[] buf = new byte[4096];
+
+		int nextLogPercentage = logIntervalPercent;
+		long alreadyWritten = 0;
+		while (true) {
+
+			int len = iStream.read(buf);
+			if (len < 0)
+				break;
+			fWriter.write(buf, 0, len);
+			alreadyWritten += len;
+			if(alreadyWritten*100 >= nextLogPercentage * dataSize){
+				Log.debug(nextLogPercentage + " %");
+				nextLogPercentage += logIntervalPercent;
+			}
+
+		}
+
+	}
 
 	public static long fileSize(File f) {
 
@@ -90,12 +115,12 @@ public class FileTools {
 
 	}
 
-	public static InputStream openFileRead(File file)
+	public static FileInputStream openFileRead(File file)
 			throws FileNotFoundException {
 		return new FileInputStream(file);
 	}
 
-	public static InputStream openFileRead(String path)
+	public static FileInputStream openFileRead(String path)
 			throws FileNotFoundException {
 		File f = new File(path);
 		return openFileRead(f);
@@ -216,6 +241,32 @@ public class FileTools {
 		f.mkdirs();
 
 	}
+	
+	public static String readFileToString(String fileName) throws FileNotFoundException{
+		
+		FileInputStream inputStream = openFileRead(fileName);
+		java.util.Scanner scanner = new java.util.Scanner(inputStream, "UTF-8");
+		scanner.useDelimiter("\\A");
+		String str = scanner.hasNext() ? scanner.next() : "";
+		scanner.close();
+		return str;
+		
+	}
+
+	public static void writeStringToFile(String fileName, String content) throws IOException{
+		
+		FileOutputStream outputStream = openFileWrite(fileName, false);
+		outputStream.write(content.getBytes());
+		
+	}
+	
+	public static void replaceInFile(String fileName, String origin, String replacement) throws IOException{
+		
+		String fileContent = readFileToString(fileName);
+		fileContent = fileContent.replace(origin, replacement);
+		writeStringToFile(fileName, fileContent);		
+		
+	}
 
 	public static void unzip(String zipName, String folderName) throws IOException
 	{
@@ -275,5 +326,5 @@ public class FileTools {
 		zipStream.close();
 
 	}
-
+	
 }

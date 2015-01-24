@@ -163,6 +163,7 @@ public class ServerMonitor implements Runnable {
 
 	private void tryStartServer() {
 		try {
+			mcDownloader.prepareStart();
 			serverWrapper.startServer();
 		} catch (Exception e) {
 			Log.err("Unable to start server!");

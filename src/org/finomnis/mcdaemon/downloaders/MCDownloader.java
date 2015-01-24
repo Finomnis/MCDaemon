@@ -15,5 +15,6 @@ public interface MCDownloader {
 	public List<String> getInvocationCommand();
 	public boolean runEditionSpecificCrashTest();
 	public String getNewVersionName();
+	public void prepareStart();
 	
 }

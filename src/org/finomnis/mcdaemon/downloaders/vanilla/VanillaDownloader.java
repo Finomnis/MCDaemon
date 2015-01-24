@@ -42,9 +42,10 @@ public class VanillaDownloader implements MCDownloader {
 		
 		newJarDownloaded = false;
 		
+		long downloadSize = DownloadTools.getContentLength(downloadUrl);
 		InputStream downloadStream = DownloadTools.openUrl(downloadUrl);
 		OutputStream newJar = FileTools.openFileWrite(newJarName, false);
-		FileTools.writeFromStream(downloadStream, newJar);
+		FileTools.writeFromStream(downloadStream, newJar, downloadSize);
 		downloadStream.close();
 		newJar.close();
 		
@@ -140,6 +141,10 @@ public class VanillaDownloader implements MCDownloader {
 	@Override
 	public String getNewVersionName() {
 		return null;
+	}
+
+	@Override
+	public void prepareStart() {
 	}
 
 }

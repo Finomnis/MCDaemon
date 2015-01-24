@@ -120,9 +120,10 @@ public class BukkitDownloader implements MCDownloader {
 		
 		Log.out("Downloading server executable...");
 
+		long downloadSize = DownloadTools.getContentLength(newestInfos[0]);
 		InputStream downloadStream = DownloadTools.openUrl(newestInfos[0]);
 		OutputStream newJar = FileTools.openFileWrite(newJarName, false);
-		FileTools.writeFromStream(downloadStream, newJar);
+		FileTools.writeFromStream(downloadStream, newJar, downloadSize);
 		downloadStream.close();
 		newJar.close();
 
@@ -246,5 +247,10 @@ public class BukkitDownloader implements MCDownloader {
 			return null;
 		
 		return newestInfos[3];
+	}
+
+	@Override
+	public void prepareStart() {
+		
 	}
 }

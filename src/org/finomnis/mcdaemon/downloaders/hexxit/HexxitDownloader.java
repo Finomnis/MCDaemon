@@ -118,9 +118,10 @@ public class HexxitDownloader implements MCDownloader {
 		
 		Log.out("Downloading server archive...");
 
+		long downloadSize = DownloadTools.getContentLength(newestInfos[0]);
 		InputStream downloadStream = DownloadTools.openUrl(newestInfos[0]);
 		OutputStream newZip = FileTools.openFileWrite(downloadName, false);
-		FileTools.writeFromStream(downloadStream, newZip);
+		FileTools.writeFromStream(downloadStream, newZip, downloadSize);
 		downloadStream.close();
 		newZip.close();
 
@@ -257,6 +258,10 @@ public class HexxitDownloader implements MCDownloader {
 			return null;
 		
 		return newestInfos[1];
+	}
+
+	@Override
+	public void prepareStart() {
 	}
 
 }
