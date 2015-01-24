@@ -95,19 +95,40 @@ public class FTBDownloader implements MCDownloader {
 		fStream.close();
 		urlStream.close();
 
-		Log.debug("Calculating MD5...");
+		Log.debug("Calculating MD5 ...");
 		String zipMd5 = FileTools.md5(new File(serverZipName));
 		Log.debug("Zip MD5: '" + zipMd5 + "'");
 		Log.debug("Downloading validation MD5 ...");
 		String validationMd5 = getModpackMD5(update_dirName, update_repoVersion,
 				update_serverPack);
-		Log.debug("Val MD5: '" + validationMd5 + "'");
-
-		if (!zipMd5.equals(validationMd5)) {
-			throw new CriticalException(
-					"Error downloading Modpack! (MD5 Checksum doesn't fit!)");
-		}
-
+		if(validationMd5 != null){
+			
+			Log.debug("Val MD5: '" + validationMd5 + "'");
+		
+			if (!zipMd5.equals(validationMd5)) {
+				throw new CriticalException(
+						"Error downloading Modpack! (MD5 Checksum doesn't fit!)");
+			}
+			
+		} else {
+			
+			Log.err("Unable to retrieve Validation MD5! Validating Modpack by size ...");
+		
+			Log.debug("Calculating size ...");
+			long zipSize = FileTools.fileSize(serverZipName);
+			Log.debug("Zip Size: " + zipSize);
+			Log.debug("Downloading validation size ...");
+			long validationSize = getModpackSize(update_dirName, update_repoVersion,
+					update_serverPack);
+			Log.debug("Val Size: " + validationSize);
+						
+			if (zipSize != validationSize) {
+				throw new CriticalException(
+						"Error downloading Modpack! (Size comparison failed!)");
+			}
+			
+		}		
+		
 		updatePrepared = true;
 	}
 
@@ -203,7 +224,7 @@ public class FTBDownloader implements MCDownloader {
 
 	}
 
-	protected String[] getModPackInfos(String modpackName)
+	private String[] getModPackInfos(String modpackName)
 			throws ParserConfigurationException, SAXException, IOException,
 			CriticalException {
 
@@ -284,7 +305,7 @@ public class FTBDownloader implements MCDownloader {
 
 	}
 
-	public static String getModpackMD5(String dir, String version,
+	private static String getModpackMD5(String dir, String version,
 			String filename) throws MalformedURLException, IOException,
 			CriticalException {
 
@@ -294,6 +315,16 @@ public class FTBDownloader implements MCDownloader {
 
 	}
 
+	private static long getModpackSize(String dir,	String version,
+			String filename) throws MalformedURLException, IOException,
+			CriticalException {
+		
+		String modpackUrl = getModpackUrl(dir, version, filename);
+
+		return DownloadTools.getContentLength(modpackUrl);
+		
+	}
+	
 	@Override
 	public void update() throws IOException, CriticalException {
 
