@@ -5,7 +5,6 @@ import java.util.Map;
 import org.finomnis.mcdaemon.tools.ConfigFile;
 import org.finomnis.mcdaemon.tools.ConfigNotFoundException;
 import org.finomnis.mcdaemon.tools.CriticalException;
-import org.finomnis.mcdaemon.tools.Log;
 
 public class VanillaConfigFile extends ConfigFile {
 
