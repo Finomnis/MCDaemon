@@ -193,7 +193,7 @@ public class VanillaDownloader implements MCDownloader {
 				prepareUpdate();
 			updatePrepared = false;
 
-			Log.out("Extracting server files...");
+			Log.out("Updating server jar...");
 			FileTools.copyFile(serverNewJarName, serverJarName);
 			
 			vanillaStatusFile.setConfig("activeVersion", update_version);
