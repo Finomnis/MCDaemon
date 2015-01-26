@@ -1,4 +1,4 @@
-MCDaemon [![Build Status](https://travis-ci.org/arthurpham/MCDaemon.png?branch=master)](https://travis-ci.org/arthurpham/MCDaemon)
+MCDaemon [![Build Status](https://travis-ci.org/Finomnis/MCDaemon.png?branch=master)](https://travis-ci.org/Finomnis/MCDaemon)
 ========
 
 A Java Daemon for automated Minecraft server maintenance
