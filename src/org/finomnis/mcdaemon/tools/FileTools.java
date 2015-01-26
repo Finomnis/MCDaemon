@@ -242,9 +242,8 @@ public class FileTools {
 
 	}
 	
-	public static String readFileToString(String fileName) throws FileNotFoundException{
+	public static String readStreamToString(InputStream inputStream){
 		
-		FileInputStream inputStream = openFileRead(fileName);
 		java.util.Scanner scanner = new java.util.Scanner(inputStream, "UTF-8");
 		scanner.useDelimiter("\\A");
 		String str = scanner.hasNext() ? scanner.next() : "";
@@ -262,7 +261,7 @@ public class FileTools {
 	
 	public static void replaceInFile(String fileName, String origin, String replacement) throws IOException{
 		
-		String fileContent = readFileToString(fileName);
+		String fileContent = readStreamToString(openFileRead(fileName));
 		fileContent = fileContent.replace(origin, replacement);
 		writeStringToFile(fileName, fileContent);		
 		

@@ -56,10 +56,14 @@ public class DownloadTools {
 		if (httpConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
 			throw new CriticalException("Unable to open URL '" + url + "'.");
 
-		String md5 = httpConnection.getHeaderField("Content-MD5").toLowerCase().trim();
+		String md5 = httpConnection.getHeaderField("Content-MD5");
 		
 		httpConnection.disconnect();
-		
+
+		if(md5 == null)
+			return null;
+			
+		md5 = md5.toLowerCase().trim();
 		if(!(isValidMD5(md5)))
 			return null;
 		

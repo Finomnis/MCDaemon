@@ -2,13 +2,13 @@ package org.finomnis.mcdaemon.downloaders.ftb;
 
 import org.finomnis.mcdaemon.MCDaemon;
 import org.finomnis.mcdaemon.downloaders.MCDownloader;
-import org.finomnis.mcdaemon.tools.ConfigFile;
 import org.finomnis.mcdaemon.tools.ConfigNotFoundException;
 import org.finomnis.mcdaemon.tools.CrashReportTools;
 import org.finomnis.mcdaemon.tools.CriticalException;
 import org.finomnis.mcdaemon.tools.DownloadTools;
 import org.finomnis.mcdaemon.tools.FileTools;
 import org.finomnis.mcdaemon.tools.Log;
+import org.finomnis.mcdaemon.tools.MinecraftTools;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -40,7 +40,7 @@ public class FTBDownloader implements MCDownloader {
 	private static final String packListUrl = downloadServerName
 			+ "/FTB2/static/modpacks.xml";
 
-	private ConfigFile ftbConfig;
+	private FTBConfigFile ftbConfig;
 	private FTBStatusFile ftbStatusFile;
 
 	private boolean updatePrepared = false;
@@ -326,19 +326,6 @@ public class FTBDownloader implements MCDownloader {
 		
 	}
 	
-	private void agreeToEula(){
-		
-		if(FileTools.fileExists(folderName + "eula.txt")){
-			try {
-				Log.debug("Agreeing to eula...");
-				FileTools.replaceInFile(folderName + "eula.txt", "eula=false", "eula=true");
-			} catch (IOException e) {
-				Log.err(e);
-			}
-		}
-		
-	}
-	
 	@Override
 	public void update() throws IOException, CriticalException {
 
@@ -487,7 +474,7 @@ public class FTBDownloader implements MCDownloader {
 
 	@Override
 	public void prepareStart() {
-		agreeToEula();
+		MinecraftTools.agreeToEula(folderName);
 	}
 
 }
