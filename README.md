@@ -20,7 +20,7 @@ Supported Minecraft-Versions:
 -----------------------------
 
 -	Vanilla
--	Bukkit
+-	~~Bukkit~~ (Out of date, currently unmaintained)
 -	FTB
 
 
