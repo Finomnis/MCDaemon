@@ -6,10 +6,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.finomnis.mcdaemon.tools.CriticalException;
 import org.finomnis.mcdaemon.tools.Log;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 public class BukkitDownloadTools {
 
@@ -22,7 +18,12 @@ public class BukkitDownloadTools {
 	
 	public static String[] fetchNewestVersionInfos(BukkitEdition edition) throws CriticalException, IOException, ParserConfigurationException
 	{
+		
 		Log.debug("Fetching newest version information...");
+		
+		/* TODO */
+		
+		/*		
 		String mainWebsiteUrl;
 		switch(edition){
 		case Recommended:
@@ -117,6 +118,9 @@ public class BukkitDownloadTools {
 		ret[3] = buildString;
 		
 		return ret;
+		*/
+		
+		return null;
 		
 	}
 	

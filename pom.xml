@@ -53,15 +53,9 @@
     </build>
     <dependencies>
         <dependency>
-            <!-- jsoup HTML parser library @ http://jsoup.org/ -->
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.7.1</version>
-        </dependency>
-        <dependency>
             <groupId>commons-daemon</groupId>
             <artifactId>commons-daemon</artifactId>
-            <version>1.0.11</version>
+            <version>1.0.15</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>

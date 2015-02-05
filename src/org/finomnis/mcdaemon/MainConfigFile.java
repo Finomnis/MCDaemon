@@ -62,7 +62,7 @@ public class MainConfigFile extends ConfigFile {
 		switch(config)
 		{
 		case "mcEdition":
-			return new String[]{"ftb", "vanilla", "bukkit", "hexxit"};
+			return new String[]{"ftb", "vanilla"};
 		case "backupEnabled":
 			return new String[]{":bool:"};
 		case "backupInterval":
