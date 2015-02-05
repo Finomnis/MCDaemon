@@ -1,6 +1,7 @@
 package org.finomnis.mcdaemon;
 
 import java.io.File;
+import java.util.Properties;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -18,6 +19,7 @@ import org.finomnis.mcdaemon.server.ServerMonitor;
 import org.finomnis.mcdaemon.server.wrapper.ServerWrapper;
 import org.finomnis.mcdaemon.tools.ConfigNotFoundException;
 import org.finomnis.mcdaemon.tools.Log;
+import org.finomnis.mcdaemon.tools.ResourceTools;
 
 public class MCDaemon {
 
@@ -33,7 +35,7 @@ public class MCDaemon {
 	private static Thread taskSchedulerThread = null;
 	private static Lock backupLock = new ReentrantLock();
 	
-	private static final String VERSION_NUMBER = "0.3.6";
+	private static final String VERSION_NUMBER = ResourceTools.getVersionNumber();
 	
 	public static void start() {
 		Log.out("Starting Daemon (MCDaemon v" + VERSION_NUMBER + ") ...");
