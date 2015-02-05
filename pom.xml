@@ -1,54 +1,50 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>MCDaemon</groupId>
-    <artifactId>MCDaemon</artifactId>
-    <version>0.3.5.2-SNAPSHOT</version>
+    <groupId>org.finomnis</groupId>
+    <artifactId>mcdaemon</artifactId>
+    <version>0.3.7-SNAPSHOT</version>
+		
+	<properties>
+		<jdk.version>1.7</jdk.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
     <build>
         <sourceDirectory>src</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>src</directory>
-                <excludes>
-                    <exclude>**/*.java</exclude>
-                </excludes>
-            </resource>
-        </resources>
+		<finalName>MCDaemon</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
                 </configuration>
             </plugin>
             <!-- Maven Assembly Plugin -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4.1</version>
+				<version>2.4.1</version>
                 <executions>
                     <execution>
-                        <id>jar-with-dependencies</id>
-                        <!-- bind to the packaging phase -->
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
-                        <configuration>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                            <archive>
-                                <manifest>
-                                    <mainClass>org.finomnis.mcdaemon.Main</mainClass>
-                                </manifest>
-                            </archive>
-                            <appendAssemblyId>false</appendAssemblyId>
-                        </configuration>
+                        
                     </execution>
                 </executions>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>org.finomnis.mcdaemon.Main</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
             </plugin>
         </plugins>
     </build>
@@ -71,13 +67,4 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <snapshots><enabled>false</enabled></snapshots>
-            <releases><enabled>true</enabled></releases>
-            <id>XNAT Maven</id>
-            <name>XNAT Maven-releases</name>
-            <url>http://maven.xnat.org/ext-release-local</url>
-        </repository>
-    </repositories>
 </project>
