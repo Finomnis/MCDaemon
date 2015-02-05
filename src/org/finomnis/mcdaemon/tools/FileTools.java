@@ -8,10 +8,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import com.twmacinta.util.MD5;
+import javax.xml.bind.DatatypeConverter;
 
 public class FileTools {
 
@@ -128,23 +130,15 @@ public class FileTools {
 
 	public static String md5(byte[] data) throws CriticalException {
 
-		/*
-		 * MessageDigest md5Calculator; try { md5Calculator =
-		 * MessageDigest.getInstance("MD5"); } catch (NoSuchAlgorithmException
-		 * e) { throw new
-		 * CriticalException("Unable to initialize MD5 calculator!"); }
-		 * 
-		 * BigInteger md5Value = new BigInteger(1, md5Calculator.digest(data));
-		 * 
-		 * return md5Value.toString(16);
-		 */
-
-		MD5 md5 = new MD5();
-		md5.Init();
-
-		md5.Update(data);
-
-		return md5.asHex();
+		MessageDigest md5Calculator;
+		
+		try {
+			md5Calculator = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			throw new CriticalException("Unable to initialize MD5 calculator!");
+		}
+		
+		return DatatypeConverter.printHexBinary(md5Calculator.digest(data)).toLowerCase();
 
 	}
 
@@ -156,11 +150,14 @@ public class FileTools {
 
 	public static String md5(File f) throws IOException, CriticalException {
 
-		/*
-		 * InputStream iStream = openFileRead(f); String md5String =
-		 * md5(iStream); iStream.close(); return md5String;
-		 */
-		return MD5.asHex(MD5.getHash(f));
+		InputStream iStream = openFileRead(f);
+		
+		String md5String =  md5(iStream);
+		
+		iStream.close();
+		
+		return md5String;
+		
 	}
 
 	public static void copyFile(String inFile, String outFile)
@@ -177,41 +174,25 @@ public class FileTools {
 	public static String md5(InputStream iStream) throws IOException,
 			CriticalException {
 
-		/*
-		 * MessageDigest md5Calculator; try { md5Calculator =
-		 * MessageDigest.getInstance("MD5"); } catch (NoSuchAlgorithmException
-		 * e) { throw new
-		 * CriticalException("Unable to initialize MD5 calculator!"); }
-		 * 
-		 * byte[] input = new byte[524288];
-		 * 
-		 * while(true) {
-		 * 
-		 * int len = iStream.read(input); if(len < 0) break;
-		 * md5Calculator.update(input, 0, len);
-		 * 
-		 * }
-		 * 
-		 * BigInteger md5Value = new BigInteger(1, md5Calculator.digest());
-		 * 
-		 * return md5Value.toString(16);
-		 */
-
-		MD5 md5 = new MD5();
-		md5.Init();
-
-		byte[] input = new byte[4096];
-
-		while (true) {
-
-			int len = iStream.read(input);
-			if (len < 0)
-				break;
-			md5.Update(input, len);
-
+		MessageDigest md5Calculator;
+		
+		try {
+			md5Calculator = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			throw new CriticalException("Unable to initialize MD5 calculator!");
 		}
-
-		return md5.asHex();
+		
+		byte[] buf = new byte[4096];
+		
+		while(true) {
+			int len = iStream.read(buf);
+			
+			if(len < 0) break;
+			
+			md5Calculator.update(buf, 0, len);
+		}
+		
+		return DatatypeConverter.printHexBinary(md5Calculator.digest()).toLowerCase();
 
 	}
 
