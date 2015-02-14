@@ -388,9 +388,15 @@ public class FTBDownloader implements MCDownloader {
 			Log.err(e);
 		}
 
-		arguments.add("-XX:+UseConcMarkSweepGC");
-		arguments.add("-XX:+CMSIncrementalMode");
-		arguments.add("-XX:+AggressiveOpts");
+		arguments.add("-server");
+		arguments.add("-XX:PermSize=256m");
+		arguments.add("-d64");
+		arguments.add("-XX:+UseParNewGC");
+		arguments.add("-XX:+CMSIncrementalPacing");
+		arguments.add("-XX:+CMSClassUnloadingEnabled");
+		arguments.add("-XX:ParallelGCThreads=2");
+		arguments.add("-XX:MinHeapFreeRatio=5");
+		arguments.add("-XX:MaxHeapFreeRatio=10");
 
 		arguments.add("-jar");
 		arguments.add(serverName);
