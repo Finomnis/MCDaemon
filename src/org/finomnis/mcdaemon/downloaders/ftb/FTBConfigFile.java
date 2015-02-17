@@ -20,6 +20,7 @@ public class FTBConfigFile extends ConfigFile {
 	protected void setDefaultValues(Map<String, String> configs) {
 		configs.put("modpackName", "\"Resurrection\"");
 		configs.put("autoSetMOTDEnabled", "true");
+		configs.put("disableMD5Check", "false");
 	}
 
 	@Override
@@ -35,6 +36,8 @@ public class FTBConfigFile extends ConfigFile {
 			return "Which modpack to download";
 		case "autoSetMOTDEnabled":
 			return "Sets MOTD to \"FTB: *serverpack* *version* (*mcVersion*)\"";
+		case "disableMD5Check":
+			return "Disables the MD5 integrity check of downloaded updates.\nOnly activate if really necessary!";
 		default:
 			return "No description available.";
 		}				
@@ -58,6 +61,8 @@ public class FTBConfigFile extends ConfigFile {
 				return new String[]{":string:"};
 			}
 		case "autoSetMOTDEnabled":
+			return new String[]{":bool:"};
+		case "disableMD5Check":
 			return new String[]{":bool:"};
 		default:
 			return null;

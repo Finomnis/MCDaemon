@@ -102,7 +102,15 @@ public class FTBDownloader implements MCDownloader {
 		Log.debug("Downloading validation MD5 ...");
 		String validationMd5 = getModpackMD5(update_dirName, update_repoVersion,
 				update_serverPack);
-		if(validationMd5 != null){
+		boolean md5CheckDisabled;
+		try {
+			md5CheckDisabled = Boolean.parseBoolean(ftbConfig
+					.getConfig("disableMD5Check"));
+		} catch (ConfigNotFoundException e) {
+			Log.err(e);
+			throw new RuntimeException("Should never happen!");
+		}
+		if(validationMd5 != null && !md5CheckDisabled){
 			
 			Log.debug("Val MD5: '" + validationMd5 + "'");
 		
