@@ -3,22 +3,22 @@
     <groupId>org.finomnis</groupId>
     <artifactId>mcdaemon</artifactId>
     <version>0.3.7-SNAPSHOT</version>
-	
-	<name>MCDaemon</name>
-	<url>https://github.com/Finomnis/MCDaemon</url>
-	
-	<properties>
-		<jdk.version>1.7</jdk.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	</properties>
+    
+    <name>MCDaemon</name>
+    <url>https://github.com/Finomnis/MCDaemon</url>
+    
+    <properties>
+        <jdk.version>1.7</jdk.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
 
     <build>
         <sourceDirectory>src</sourceDirectory>
-		<finalName>MCDaemon</finalName>
+        <finalName>MCDaemon</finalName>
         <plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
@@ -28,9 +28,9 @@
             </plugin>
             <!-- Maven Shade Plugin -->
             <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.3</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.3</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -39,15 +39,39 @@
                         </goals>
                     </execution>
                 </executions>
-				<configuration>
-					<transformers>
-						<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-							<mainClass>org.finomnis.mcdaemon.Main</mainClass>
-						</transformer>
-					</transformers>
-					<minimizeJar>true</minimizeJar>
-					<createDependencyReducedPom>false</createDependencyReducedPom>
-				</configuration>
+                <configuration>
+                    <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <mainClass>org.finomnis.mcdaemon.Main</mainClass>
+                        </transformer>
+                    </transformers>
+                    <minimizeJar>true</minimizeJar>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
+            </plugin>
+            <!-- Maven Copy Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                  <execution>
+                    <id>copy-jars-to-build-dev</id>
+                    <phase>install</phase>
+                    <configuration>
+                      <target name="copy MCDaemon.jar to build/dev">
+                        <copy todir="${project.basedir}/build/dev">
+                            <fileset dir="${project.build.directory}">
+                                <include name="MCDaemon.jar"/>
+                            </fileset>
+                        </copy>
+                      </target>
+                    </configuration>
+                    <goals>
+                      <goal>run</goal>
+                    </goals>
+                  </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
