@@ -405,6 +405,8 @@ public class FTBDownloader implements MCDownloader {
 		arguments.add("-XX:ParallelGCThreads=2");
 		arguments.add("-XX:MinHeapFreeRatio=5");
 		arguments.add("-XX:MaxHeapFreeRatio=10");
+		
+		arguments.add("-Dfml.queryResult=confirm");
 
 		arguments.add("-jar");
 		arguments.add(serverName);
